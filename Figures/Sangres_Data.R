@@ -131,6 +131,11 @@ est_data<-merged_summary
 treatment_summary <- merged_summary %>%
   group_by(TreatmentStatus)%>%
   summarize(Tree_count = sum(Tree_count), MOG_count = sum(MOG_count), MOG_live_count = sum(MOG_live_count), Surveyed_ha = sum(PlotSize))
+
+#Jonathan, see "treatment_summary" and "merged_summary" dataframes.  These will have the data you'll want to make figures!
+#I updated some variable names to match your figure code, but you may have to change or calculate a few
+#I think MOG and OG density is less important to visualize than MOG and OG numbers alone, since sample size is what we are interested in
+# Note I added stats for live MOGs.  We will want to plot this data as this is also an important sample subset we're interested in (tracking MOG that have capacity to die later!)
 ---------------------------------------------------------------------------------------------------------------
 
 ## DATA BY PLOT

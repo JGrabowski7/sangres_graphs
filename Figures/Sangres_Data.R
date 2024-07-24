@@ -170,27 +170,6 @@ ggplot(est_data, aes(x= reorder(PlotName, MOG_count), y= MOG_count)) +
 --------------------------------------------------------------------------------------------------------------  
 
 ## DATA BY TREATMENT
-  
-
-## Get MOG density per ha per treatment
-## Then make a graph of MOG density per treatment
-  
-TreatedMOGDensity <- sum(subset(est_data, TreatmentStatus == 'Treated')$MOGDensityPerHa)
-
-UntreatedMOGDensity <- sum(subset(est_data, TreatmentStatus == 'Untreated')$MOGDensityPerHa)
-  
-Treatment <- c('Treated', 'Untreated')
-
-TotalMOGDensity <- c(TreatedMOGDensity, UntreatedMOGDensity)
-
-TotalMOGDensityByTreatment <- data.frame(Treatment, TotalMOGDensity)
-  
-ggplot(TotalMOGDensityByTreatment, aes(x = Treatment, y = TotalMOGDensity)) +
-  geom_bar(stat = "identity", color = 'black', aes(fill = Treatment)) +
-  ylab("MOG density (ha)") +
-  ylim(0, 800) +
-  theme_classic() +
-  theme(legend.position = "none")
 
 ## Get total area of treated and untreated plots 
 ## Then make a graph of total area by treatment

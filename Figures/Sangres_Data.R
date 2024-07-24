@@ -2,12 +2,127 @@
 
 library(ggplot2)
 library(reshape2)
+library(readxl)
+library(dplyr)
 
-## Load data
-## Your path may be different so be sure to change that
 
-est_data <- read.csv("S:/Ecology/Student_folders_&_files/Jonathan 2024/Sangres/Establishment_Stats_2024.csv")
+###CJM's data prep 
 
+#Read in excel sheets.  Probably should be using csvs but I'm lazy.  See how this goes
+SFS4 <- read_excel ("C:/Users/cjmay/Documents/GitHub/sangres_graphs/Data/sfs4 bible 2024.xlsx")
+#NOTE: should get BTN4 species as well
+BTN4 <- read_excel ("C:/Users/cjmay/Documents/GitHub/sangres_graphs/Data/btn4 revisit data 2024.xlsx")
+SFF1 <- read_excel ("C:/Users/cjmay/Documents/GitHub/sangres_graphs/Data/sff1 establishment data.xlsx")
+SFF2 <- read_excel ("C:/Users/cjmay/Documents/GitHub/sangres_graphs/Data/sff2 establishment 2024 data.xlsx")
+SFF5 <- read_excel ("C:/Users/cjmay/Documents/GitHub/sangres_graphs/Data/sff5 establishment data 2024.xlsx")
+SFF8 <- read_excel ("C:/Users/cjmay/Documents/GitHub/sangres_graphs/Data/sff8 establishment data.xlsx")
+SFF10 <- read_excel("C:/Users/cjmay/Documents/GitHub/sangres_graphs/Data/sff10 initial 2024 data.xlsx")
+
+
+#Fix janky column name in SFF2
+names(SFF2)[5] <- paste("DBH")
+
+#Add plot numbers to treeIDs
+
+SFS4$Tree_num = paste0('SFS4-', SFS4$Tree_num)
+BTN4$Tree_num = paste0('BTN4-', BTN4$Tree_num)
+SFF1$Tree_num = paste0('SFF1-', SFF1$Tree_num)
+SFF2$Tree_num = paste0('SFF2-', SFF2$Tree_num)
+SFF5$Tree_num = paste0('SFF5-', SFF5$Tree_num)
+SFF8$Tree_num = paste0('SFF8-', SFF8$Tree_num)
+SFF10$Tree_num = paste0('SFF10-', SFF10$Tree_num)
+
+#Add plot number to data
+SFS4$PlotName <- "SFS4"
+BTN4$PlotName <- "BTN4"
+SFF1$PlotName <- "SFF1"
+SFF2$PlotName <- "SFF2"
+SFF5$PlotName <- "SFF5"
+SFF8$PlotName <- "SFF8"
+SFF10$PlotName <- "SFF10"
+
+#Add treatment status
+
+SFS4$TreatmentStatus <- "Treated"
+BTN4$TreatmentStatus <- "Untreated"
+SFF1$TreatmentStatus <- "Treated"
+SFF2$TreatmentStatus <- "Untreated"
+SFF5$TreatmentStatus <- "Treated"
+SFF8$TreatmentStatus <- "Treated"
+SFF10$TreatmentStatus <- "Treated"
+
+#Add plot size
+SFS4$PlotSize <- 1
+BTN4$PlotSize <- 1
+SFF1$PlotSize <- 0.25
+SFF2$PlotSize <- 1
+SFF5$PlotSize <- 0.25
+SFF8$PlotSize <- 1
+SFF10$PlotSize <- 0.25
+  
+#Select columns of interest (I'm begging someone to write a loop, this is so embarrasing)
+
+SFS4 <- SFS4 %>%
+  select(PlotName, PlotSize, TreatmentStatus, Tree_num, Species, Condition, DBH, OG, Notes)
+BTN4 <- BTN4 %>%
+  select(PlotName, PlotSize, TreatmentStatus, Tree_num, Species, Condition, DBH, OG, Notes)
+SFF1 <- SFF1 %>%
+  select(PlotName, PlotSize, TreatmentStatus, Tree_num, Species, Condition, DBH, OG, Notes)
+SFF10 <- SFF10 %>%
+  select(PlotName, PlotSize, TreatmentStatus, Tree_num, Species, Condition, DBH, OG, Notes)
+SFF8 <- SFF8 %>%
+  select(PlotName, PlotSize, TreatmentStatus, Tree_num, Species, Condition, DBH, OG, Notes)
+SFF2 <- SFF2 %>%
+  select(PlotName, PlotSize, TreatmentStatus, Tree_num, Species, Condition, DBH, OG, Notes)
+SFF5 <- SFF5 %>%
+  select(PlotName, PlotSize, TreatmentStatus, Tree_num, Species, Condition, DBH, OG,  Notes)
+
+#Okay well, now we merge all the plots into one dataframe
+SFS4$Condition <- as.numeric(SFS4$Condition)
+merged_plots <- bind_rows(SFS4, BTN4, SFF1, SFF10, SFF8, SFF2, SFF5)
+
+#Now we add a column to define MOG as Y or NA
+merged_plots <- merged_plots %>%
+  mutate(MOG = case_when(OG == "Y" | DBH > 30 ~ "Y"))
+             
+#calculate tree counts
+merged_summary <- merged_plots %>%
+  group_by(PlotName, PlotSize, TreatmentStatus) %>%
+  summarize(Tree_count = n(), meanDBH = mean(DBH, na.rm = TRUE))
+
+#calculate MOG stats
+merged_MOG <- merged_plots %>%
+  filter(MOG == "Y")%>%
+  group_by(PlotName, PlotSize, TreatmentStatus)%>%
+  summarize(MOG_count = n())
+
+#calculate live MOG stats
+merged_MOG_live <- merged_plots %>%
+  filter(MOG == "Y" & Condition != 5 & Condition != 2) %>%
+  group_by(PlotName, PlotSize, TreatmentStatus) %>%
+  summarize(MOG_live_count = n())
+
+#calculate OG stats
+merged_OG <- merged_plots %>%
+  filter(OG == "Y") %>%
+  group_by(PlotName, PlotSize, TreatmentStatus) %>%
+  summarize(OG_count = n())
+
+#merge em all together.  probably a better way to do this, but here we are
+merged_summary$MOG_count <- merged_MOG$MOG_count
+merged_summary$MOG_live_count <- merged_MOG_live$MOG_live_count
+merged_summary$OG_count <- merged_OG$OG_count
+
+#Calculate TPH
+merged_summary$TPH <- merged_summary$Tree_count/merged_summary$PlotSize
+est_data<-merged_summary
+
+
+
+###Okay, now for some treatment level stats
+treatment_summary <- merged_summary %>%
+  group_by(TreatmentStatus)%>%
+  summarize(Tree_count = sum(Tree_count), MOG_count = sum(MOG_count), MOG_live_count = sum(MOG_live_count), Surveyed_ha = sum(PlotSize))
 ---------------------------------------------------------------------------------------------------------------
 
 ## DATA BY PLOT

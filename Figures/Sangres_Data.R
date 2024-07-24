@@ -228,8 +228,6 @@ ggplot(NumMOGByTreatment, aes(x = Treatment, y = NumMOG)) +
 
 ## OG and MOG by plot
   
-## change the number after each to the total number of plots
-  
 ## I'm not sure how this works but here's where I got the code from:
   ##https://stackoverflow.com/questions/10212106/creating-grouped-bar-plot-of-multi-column-data-in-r
   

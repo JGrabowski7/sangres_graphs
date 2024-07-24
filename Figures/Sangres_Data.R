@@ -244,7 +244,7 @@ ggplot(NumMOGByTreatment, aes(x = Treatment, y = NumMOG)) +
 OGvsMOG <- melt(est_data[,c('PlotName','OG_count','MOG_count')],id.vars = 1)
   
 ggplot(OGvsMOG ,aes(x = PlotName, y = value)) + 
-  geom_bar(aes(fill = variable),stat = "identity",position = "dodge") +
+  geom_bar(aes(fill = variable), stat = "identity", position = "dodge") +
   xlab("Plot") +
   ylab("Number of trees") +
   ylim(0, 200) +

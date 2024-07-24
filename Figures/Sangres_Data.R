@@ -235,14 +235,14 @@ ggplot(NumMOGByTreatment, aes(x = Treatment, y = NumMOG)) +
   
 condition <- rep(c("OG", "MOG"), times = 6)
 
-data <- melt(est_data[,c('PlotName','NumOG','NumMOG')],id.vars = 1)
+OGvsMOG <- melt(est_data[,c('PlotName','OG_count','MOG_count')],id.vars = 1)
   
-ggplot(data ,aes(x = PlotName, y = value)) + 
+ggplot(OGvsMOG ,aes(x = PlotName, y = value)) + 
   geom_bar(aes(fill = variable),stat = "identity",position = "dodge") +
   xlab("Plot") +
   ylab("Number of trees") +
   ylim(0, 200) +
-  scale_fill_discrete(labels = c('Old Growth', 'Mature Old Growth')) +
+  scale_fill_manual(values=c("yellow", "blue"), labels = c('Old Growth', 'Mature Old Growth')) +
   theme_classic() +
   theme(legend.title = element_blank())
   

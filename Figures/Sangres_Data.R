@@ -175,6 +175,37 @@ ggplot(est_data, aes(x= reorder(PlotName, MOG_count), y= MOG_count)) +
   theme_classic() +
   theme(legend.title = element_blank())
 
+## Makes a graph showing the number of live MOG sampled per plot
+
+ggplot(est_data, aes(x= reorder(PlotName, MOG_live_count), y= MOG_live_count)) +
+  geom_bar(stat="identity", color = 'black', aes(fill = TreatmentStatus)) +
+  xlab("Plot") +
+  ylab("Number of live mature old growth") +
+  theme_classic() +
+  theme(legend.title = element_blank())
+
+## Makes a graph showing the number of OG sampled per plot
+
+ggplot(est_data, aes(x= reorder(PlotName, OG_count), y= OG_count)) +
+  geom_bar(stat="identity", color = 'black', aes(fill = TreatmentStatus)) +
+  xlab("Plot") +
+  ylab("Number of old growth") +
+  ylim(0,200) +
+  theme_classic() +
+  theme(legend.title = element_blank())
+
+## Makes a graph showing the number of MOG per ha per plot
+
+MOGperHA <- est_data$MOG_count / est_data$PlotSize
+
+ggplot(est_data, aes(x= reorder(PlotName, MOGperHA), y= MOGperHA)) +
+  geom_bar(stat="identity", color = 'black', aes(fill = TreatmentStatus)) +
+  xlab("Plot") +
+  ylab("Mature old growth density (trees per ha)") +
+  ylim(0,200) +
+  theme_classic() +
+  theme(legend.title = element_blank())
+
 --------------------------------------------------------------------------------------------------------------  
 
 ## DATA BY TREATMENT

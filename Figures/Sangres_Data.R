@@ -18,7 +18,16 @@ SFF5 <- read_excel ("C:/Users/cjmay/Documents/GitHub/sangres_graphs/Data/sff5 es
 SFF8 <- read_excel ("C:/Users/cjmay/Documents/GitHub/sangres_graphs/Data/sff8 establishment data.xlsx")
 SFF10 <- read_excel("C:/Users/cjmay/Documents/GitHub/sangres_graphs/Data/sff10 initial 2024 data.xlsx")
 
+# I'm just gonna add this so it's easier for me to run code - Jonathan
 
+SFS4 <- read_excel("S:/Ecology/Student_folders_&_files/Jonathan 2024/sangres_graphs/Data/sfs4 bible 2024.xlsx")
+BTN4 <- read_excel("S:/Ecology/Student_folders_&_files/Jonathan 2024/sangres_graphs/Data/btn4 revisit data 2024.xlsx")
+SFF1 <- read_excel("S:/Ecology/Student_folders_&_files/Jonathan 2024/sangres_graphs/Data/sff1 establishment data.xlsx")
+SFF2 <- read_excel("S:/Ecology/Student_folders_&_files/Jonathan 2024/sangres_graphs/Data/sff2 establishment 2024 data.xlsx")
+SFF5 <- read_excel("S:/Ecology/Student_folders_&_files/Jonathan 2024/sangres_graphs/Data/sff5 establishment data 2024.xlsx")
+SFF8 <- read_excel("S:/Ecology/Student_folders_&_files/Jonathan 2024/sangres_graphs/Data/sff8 establishment data.xlsx")
+SFF10 <- read_excel("S:/Ecology/Student_folders_&_files/Jonathan 2024/sangres_graphs/Data/sff10 initial 2024 data.xlsx")
+  
 #Fix janky column name in SFF2
 names(SFF2)[5] <- paste("DBH")
 
@@ -118,7 +127,6 @@ merged_summary$TPH <- merged_summary$Tree_count/merged_summary$PlotSize
 est_data<-merged_summary
 
 
-
 ###Okay, now for some treatment level stats
 treatment_summary <- merged_summary %>%
   group_by(TreatmentStatus)%>%
@@ -139,7 +147,7 @@ ggplot(est_data, aes(x= reorder(PlotName, MOGDensityPerHa), y= MOGDensityPerHa))
 
 ## Makes a graph of total area per plot
 
-ggplot(est_data, aes(x= reorder(PlotName, PlotSize.ha.), y= PlotSize.ha.)) +
+ggplot(est_data, aes(x= reorder(PlotName, PlotSize), y= PlotSize)) +
   geom_bar(stat="identity", color = 'black', aes(fill = TreatmentStatus)) +
   xlab("Plot") +
   ylab("Total area (ha)") +
@@ -148,7 +156,7 @@ ggplot(est_data, aes(x= reorder(PlotName, PlotSize.ha.), y= PlotSize.ha.)) +
 
 ## Makes a graph of the number of trees sampled per plot
 
-ggplot(est_data, aes(x= reorder(PlotName, NumTrees), y= NumTrees)) +
+ggplot(est_data, aes(x= reorder(PlotName, Tree_count), y= Tree_count)) +
   geom_bar(stat="identity", color = 'black', aes(fill = TreatmentStatus)) +
   xlab("Plot") +
   ylab("Number of trees") +
@@ -157,10 +165,10 @@ ggplot(est_data, aes(x= reorder(PlotName, NumTrees), y= NumTrees)) +
 
 ## Makes a graph showing the number of MOG sampled per plot
 
-ggplot(est_data, aes(x= reorder(PlotName, NumMOG), y= NumMOG)) +
+ggplot(est_data, aes(x= reorder(PlotName, MOG_count), y= MOG_count)) +
   geom_bar(stat="identity", color = 'black', aes(fill = TreatmentStatus)) +
   xlab("Plot") +
-  ylab("Number of trees") +
+  ylab("Number of mature old growth") +
   theme_classic() +
   theme(legend.title = element_blank())
 
@@ -192,9 +200,9 @@ ggplot(TotalMOGDensityByTreatment, aes(x = Treatment, y = TotalMOGDensity)) +
 ## Get total area of treated and untreated plots 
 ## Then make a graph of total area by treatment
 
-TreatedArea <- sum(subset(est_data, TreatmentStatus == 'Treated')$PlotSize.ha.)
+TreatedArea <- sum(subset(est_data, TreatmentStatus == 'Treated')$PlotSize)
 
-UntreatedArea <- sum(subset(est_data, TreatmentStatus == 'Untreated')$PlotSize.ha.)
+UntreatedArea <- sum(subset(est_data, TreatmentStatus == 'Untreated')$PlotSize)
 
 TotalArea <- c(TreatedArea, UntreatedArea)
 

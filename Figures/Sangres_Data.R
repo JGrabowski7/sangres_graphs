@@ -140,16 +140,6 @@ treatment_summary <- merged_summary %>%
 
 ## DATA BY PLOT
 
-  
-## Makes a graph of MOG density (ha) per plot
-
-ggplot(est_data, aes(x= reorder(PlotName, MOGDensityPerHa), y= MOGDensityPerHa)) +
-  geom_bar(stat="identity", color = 'black', aes(fill = TreatmentStatus)) +
-  xlab("Plot") +
-  ylab("MOG density (ha)") +
-  theme_classic() +
-  theme(legend.title = element_blank())
-
 ## Makes a graph of total area per plot
 
 ggplot(est_data, aes(x= reorder(PlotName, PlotSize), y= PlotSize)) +

@@ -240,8 +240,6 @@ ggplot(NumMOGByTreatment, aes(x = Treatment, y = NumMOG)) +
   
 ## I'm not sure how this works but here's where I got the code from:
   ##https://stackoverflow.com/questions/10212106/creating-grouped-bar-plot-of-multi-column-data-in-r
-  
-condition <- rep(c("OG", "MOG"), times = 6)
 
 OGvsMOG <- melt(est_data[,c('PlotName','OG_count','MOG_count')],id.vars = 1)
   

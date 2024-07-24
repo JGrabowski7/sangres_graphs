@@ -39,6 +39,7 @@ SFS4$Tree_num = paste0('SFS4-', SFS4$Tree_num)
 BTN4$Tree_num = paste0('BTN4-', BTN4$Tree_num)
 SFF1$Tree_num = paste0('SFF1-', SFF1$Tree_num)
 SFF2$Tree_num = paste0('SFF2-', SFF2$Tree_num)
+SFF3$Tree_num = paste0('SFF3-', SFF3$Tree_num)
 SFF5$Tree_num = paste0('SFF5-', SFF5$Tree_num)
 SFF8$Tree_num = paste0('SFF8-', SFF8$Tree_num)
 SFF10$Tree_num = paste0('SFF10-', SFF10$Tree_num)
@@ -48,6 +49,7 @@ SFS4$PlotName <- "SFS4"
 BTN4$PlotName <- "BTN4"
 SFF1$PlotName <- "SFF1"
 SFF2$PlotName <- "SFF2"
+SFF3$PlotName <- "SFF3"
 SFF5$PlotName <- "SFF5"
 SFF8$PlotName <- "SFF8"
 SFF10$PlotName <- "SFF10"
@@ -58,6 +60,7 @@ SFS4$TreatmentStatus <- "Treated"
 BTN4$TreatmentStatus <- "Untreated"
 SFF1$TreatmentStatus <- "Treated"
 SFF2$TreatmentStatus <- "Untreated"
+SFF3$TreatmentStatus <- "Untreated"
 SFF5$TreatmentStatus <- "Treated"
 SFF8$TreatmentStatus <- "Treated"
 SFF10$TreatmentStatus <- "Treated"
@@ -67,6 +70,7 @@ SFS4$PlotSize <- 1
 BTN4$PlotSize <- 1
 SFF1$PlotSize <- 0.25
 SFF2$PlotSize <- 1
+SFF3$PlotSize <- 0.25
 SFF5$PlotSize <- 0.25
 SFF8$PlotSize <- 1
 SFF10$PlotSize <- 0.25
@@ -85,12 +89,14 @@ SFF8 <- SFF8 %>%
   select(PlotName, PlotSize, TreatmentStatus, Tree_num, Species, Condition, DBH, OG, Notes)
 SFF2 <- SFF2 %>%
   select(PlotName, PlotSize, TreatmentStatus, Tree_num, Species, Condition, DBH, OG, Notes)
+SFF3 <- SFF3 %>%
+  select(PlotName, PlotSize, TreatmentStatus, Tree_num, Species, Condition, DBH, OG, Notes)
 SFF5 <- SFF5 %>%
   select(PlotName, PlotSize, TreatmentStatus, Tree_num, Species, Condition, DBH, OG,  Notes)
 
 #Okay well, now we merge all the plots into one dataframe
 SFS4$Condition <- as.numeric(SFS4$Condition)
-merged_plots <- bind_rows(SFS4, BTN4, SFF1, SFF10, SFF8, SFF2, SFF5)
+merged_plots <- bind_rows(SFS4, BTN4, SFF1, SFF10, SFF8, SFF2, SFF3, SFF5)
 
 #Now we add a column to define MOG as Y or NA
 merged_plots <- merged_plots %>%
@@ -182,6 +188,8 @@ UntreatedArea <- sum(subset(est_data, TreatmentStatus == 'Untreated')$PlotSize)
 
 TotalArea <- c(TreatedArea, UntreatedArea)
 
+Treatment <- c("Treated", "Untreated")
+
 AreaByTreatment <- data.frame(Treatment, TotalArea)
 
 ggplot(AreaByTreatment, aes(x = Treatment, y = TotalArea)) +
@@ -193,9 +201,9 @@ ggplot(AreaByTreatment, aes(x = Treatment, y = TotalArea)) +
 ## Get total number of trees in treated and untreated plots
 ## Then make a graph of number of trees by treatment
 
-TreatedNumTrees <- sum(subset(est_data, TreatmentStatus == 'Treated')$NumTrees)
+TreatedNumTrees <- sum(subset(est_data, TreatmentStatus == 'Treated')$Tree_count)
 
-UntreatedNumTrees <- sum(subset(est_data, TreatmentStatus == 'Untreated')$NumTrees)
+UntreatedNumTrees <- sum(subset(est_data, TreatmentStatus == 'Untreated')$Tree_count)
 
 NumTrees <- c(TreatedNumTrees, UntreatedNumTrees)
 
@@ -204,16 +212,16 @@ NumTreesByTreatment <- data.frame(Treatment, NumTrees)
 ggplot(NumTreesByTreatment, aes(x = Treatment, y = NumTrees)) +
   geom_bar(stat = "identity", color = 'black', aes(fill = Treatment)) +
   ylab("Number of trees") +
-  ylim(0, 3000) +
+  ylim(0, 4000) +
   theme_classic() +
   theme(legend.position = "none")
 
 ## Get total number of MOG in treated and untreated plots
 ## Then make a graph of number of MOG per treatment
 
-TreatedMOG <- sum(subset(est_data, TreatmentStatus == 'Treated')$NumMOG)
+TreatedMOG <- sum(subset(est_data, TreatmentStatus == 'Treated')$MOG_count)
 
-UntreatedMOG <- sum(subset(est_data, TreatmentStatus == 'Untreated')$NumMOG)
+UntreatedMOG <- sum(subset(est_data, TreatmentStatus == 'Untreated')$MOG_count)
 
 NumMOG <- c(TreatedMOG, UntreatedMOG)
 
@@ -222,7 +230,7 @@ NumMOGByTreatment <- data.frame(Treatment, NumMOG)
 ggplot(NumMOGByTreatment, aes(x = Treatment, y = NumMOG)) +
   geom_bar(stat = "identity", color = 'black', aes(fill = Treatment)) +
   ylab("Number of mature old growth") +
-  ylim(0, 400) +
+  ylim(0, 500) +
   theme_classic() +
   theme(legend.position = "none")
 

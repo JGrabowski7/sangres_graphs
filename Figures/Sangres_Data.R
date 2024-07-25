@@ -265,6 +265,30 @@ ggplot(NumMOGByTreatment, aes(x = Treatment, y = NumMOG)) +
   theme_classic() +
   theme(legend.position = "none")
 
+## Get number of live MOG in treated and untreated plots
+## Then make a graph of the number of  live MOG per treatment
+
+TreatedLiveMOG <- sum(subset(est_data, TreatmentStatus == 'Treated')$MOG_live_count)
+
+UntreatedLiveMOG <- sum(subset(est_data, TreatmentStatus == 'Untreated')$MOG_live_count)
+
+NumLiveMOG <- c(TreatedLiveMOG, UntreatedLiveMOG)
+
+NumLiveMOGbyTreatment <- data.frame(Treatment, NumLiveMOG)
+
+ggplot(NumMOGByTreatment, aes(x = Treatment, y = NumMOG)) +
+  geom_bar(stat = "identity", color = 'black', aes(fill = Treatment)) +
+  ylab("Number of live mature old growth") +
+  ylim(0, 400) +
+  theme_classic() +
+  theme(legend.position = "none")
+
+## Get MOG
+
+
+## Makes a graph showing the number of MOG per ha per plot
+
+
 -------------------------------------------------------------------------------------------------------------
 
 ## OG and MOG by plot

@@ -265,8 +265,8 @@ ggplot(NumMOGByTreatment, aes(x = Treatment, y = NumMOG)) +
   theme_classic() +
   theme(legend.position = "none")
 
-## Get number of live MOG in treated and untreated plots
-## Then make a graph of the number of  live MOG per treatment
+## Get number of live MOG's in treated and untreated plots
+## Then make a graph of the number of live MOG per treatment
 
 TreatedLiveMOG <- sum(subset(est_data, TreatmentStatus == 'Treated')$MOG_live_count)
 
@@ -276,22 +276,40 @@ NumLiveMOG <- c(TreatedLiveMOG, UntreatedLiveMOG)
 
 NumLiveMOGbyTreatment <- data.frame(Treatment, NumLiveMOG)
 
-ggplot(NumMOGByTreatment, aes(x = Treatment, y = NumMOG)) +
+ggplot(NumMOGByTreatment, aes(x = Treatment, y = NumLiveMOG)) +
   geom_bar(stat = "identity", color = 'black', aes(fill = Treatment)) +
   ylab("Number of live mature old growth") +
   ylim(0, 400) +
   theme_classic() +
   theme(legend.position = "none")
 
-## Get OG
+## Get number of OG's in the treated and untreated pots
+## Then make a graph of the number of OG's per treatment
 
+TreatedOG <- sum(subset(est_data, TreatmentStatus == 'Treated')$OG_count)
+  
+UntreatedOG <- sum(subset(est_data, TreatmentStatus == 'Untreated')$OG_count)
+  
+NumOG <- c(TreatedOG, UntreatedOG)
+  
+NumOGbyTreatment <- data.frame(Treatment, NumOG)
 
+ggplot(NumMOGByTreatment, aes(x = Treatment, y = NumOG)) +
+  geom_bar(stat = "identity", color = 'black', aes(fill = Treatment)) +
+  ylab("Number of old growth") +
+  ylim(0, 250) +
+  theme_classic() +
+  theme(legend.position = "none")
 
 ## Makes a graph showing the number of MOG per ha per plot
 
 
+
 -------------------------------------------------------------------------------------------------------------
 
+## OTHER COOL GRAPHS 
+  
+  
 ## OG and MOG by plot
   
 ## I'm not sure how this works but here's where I got the code from:

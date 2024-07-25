@@ -196,7 +196,9 @@ ggplot(est_data, aes(x= reorder(PlotName, OG_count), y= OG_count)) +
 
 ## Makes a graph showing the number of MOG per ha per plot
 
-MOGperHA <- est_data$MOG_count / est_data$PlotSize
+MOGperHectare <- est_data$MOG_count / est_data$PlotSize
+
+est_data$MOGperha <- MOGperHectare 
 
 ggplot(est_data, aes(x= reorder(PlotName, MOGperHA), y= MOGperHA)) +
   geom_bar(stat="identity", color = 'black', aes(fill = TreatmentStatus)) +
@@ -303,7 +305,20 @@ ggplot(NumMOGByTreatment, aes(x = Treatment, y = NumOG)) +
 
 ## Makes a graph showing the number of MOG per ha per plot
 
+TreatedMOGperha <- sum(subset(est_data, TreatmentStatus == 'Treated')$MOGperha)
 
+UntreatedMOGperha <- sum(subset(est_data, TreatmentStatus == 'Untreated')$MOGperha)
+
+NumMOGperha <- c(TreatedMOGperha, UntreatedMOGperha)
+
+NumMOGperhaByTreatment <- data.frame(Treatment, NumMOGperha)
+
+ggplot(NumMOGByTreatment, aes(x = Treatment, y = NumMOGperha)) +
+  geom_bar(stat = "identity", color = 'black', aes(fill = Treatment)) +
+  ylab("Mature old growth density") +
+  ylim(0, 1000) +
+  theme_classic() +
+  theme(legend.position = "none")
 
 -------------------------------------------------------------------------------------------------------------
 

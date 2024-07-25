@@ -332,8 +332,25 @@ ggplot(NumMOGByTreatment, aes(x = Treatment, y = NumMOGperha)) +
 
 OGvsMOG <- melt(est_data[,c('PlotName','OG_count','MOG_count')],id.vars = 1)
   
-ggplot(OGvsMOG ,aes(x = PlotName, y = value)) + 
+ggplot(OGvsMOG , aes(x = PlotName, y = value)) + 
   geom_bar(aes(fill = variable), stat = "identity", color = 'black', position = "dodge") +
+  xlab("Plot") +
+  ylab("Number of trees") +
+  ylim(0, 200) +
+  scale_fill_manual(values=c("yellow", "blue"), labels = c('Old Growth', 'Mature Old Growth')) +
+  theme_classic() +
+  theme(legend.title = element_blank())
+
+## OG and MOG by plot but its a stacked bar graph
+
+MOGMinusOG <- est_data$MOG_count - est_data$OG_count
+
+est_data$MOGMinusOG <- MOGMinusOG
+
+OGvsMOGpart2 <- melt(est_data[,c('PlotName','MOG_count','MOGMinusOG')],id.vars = 1)
+
+ggplot(est_data, aes(x = PlotName, y = , fill = position)) + 
+  geom_bar(position = 'stack', stat = "identity") +
   xlab("Plot") +
   ylab("Number of trees") +
   ylim(0, 200) +

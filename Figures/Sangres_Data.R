@@ -282,5 +282,34 @@ ggplot(OGvsMOG ,aes(x = PlotName, y = value)) +
   scale_fill_manual(values=c("yellow", "blue"), labels = c('Old Growth', 'Mature Old Growth')) +
   theme_classic() +
   theme(legend.title = element_blank())
+
+
+-------------------------------------------------------------------------------------------------------
+## Plot-level Histograms & Other fun things Carolina is playing around with
   
+  #all trees by plot (species-color-coded)
+  ggplot(merged_plots, aes(x=DBH)) + geom_histogram()
+# Change the width of bins
+ggplot(merged_plots, aes(x=DBH, fill = Species, color = Species)) + 
+  geom_histogram(binwidth=2)+
+  xlab("DBH (cm)")+
+  facet_wrap(~PlotName)
+
+#same but facet by treatment status
+#all trees by plot (species-color-coded)
+ggplot(merged_plots, aes(x=DBH)) + geom_histogram()
+# Change the width of bins
+ggplot(merged_plots, aes(x=DBH, fill = Species, color = Species)) + 
+  geom_histogram(binwidth=2)+
+  xlab("DBH (cm)")+
+  facet_wrap(~TreatmentStatus)
+
+merged_plots$Condition <- as.factor(merged_plots$Condition)
+#all trees by plot (live vs. dead)
+ggplot(merged_plots, aes(x=DBH)) + geom_histogram()
+# Change the width of bins
+ggplot(merged_plots, aes(x=DBH, fill = Condition, color = Condition)) + 
+  geom_histogram(binwidth=2)+
+  xlab("DBH (cm)")+
+  facet_wrap(~TreatmentStatus)
   

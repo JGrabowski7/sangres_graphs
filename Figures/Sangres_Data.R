@@ -283,7 +283,8 @@ ggplot(NumMOGByTreatment, aes(x = Treatment, y = NumMOG)) +
   theme_classic() +
   theme(legend.position = "none")
 
-## Get MOG
+## Get OG
+
 
 
 ## Makes a graph showing the number of MOG per ha per plot

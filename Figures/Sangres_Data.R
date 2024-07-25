@@ -205,7 +205,9 @@ ggplot(est_data, aes(x= reorder(PlotName, OG_count), y= OG_count)) +
 
 ## Makes a graph showing the number of MOG per ha per plot
 
-MOGperHA <- est_data$MOG_count / est_data$PlotSize
+MOGperHectare <- est_data$MOG_count / est_data$PlotSize
+
+est_data$MOGperha <- MOGperHectare 
 
 ggplot(est_data, aes(x= reorder(PlotName, MOGperHA), y= MOGperHA)) +
   geom_bar(stat="identity", color = 'black', aes(fill = TreatmentStatus)) +
@@ -274,8 +276,64 @@ ggplot(NumMOGByTreatment, aes(x = Treatment, y = NumMOG)) +
   theme_classic() +
   theme(legend.position = "none")
 
+## Get number of live MOG's in treated and untreated plots
+## Then make a graph of the number of live MOG per treatment
+
+TreatedLiveMOG <- sum(subset(est_data, TreatmentStatus == 'Treated')$MOG_live_count)
+
+UntreatedLiveMOG <- sum(subset(est_data, TreatmentStatus == 'Untreated')$MOG_live_count)
+
+NumLiveMOG <- c(TreatedLiveMOG, UntreatedLiveMOG)
+
+NumLiveMOGbyTreatment <- data.frame(Treatment, NumLiveMOG)
+
+ggplot(NumMOGByTreatment, aes(x = Treatment, y = NumLiveMOG)) +
+  geom_bar(stat = "identity", color = 'black', aes(fill = Treatment)) +
+  ylab("Number of live mature old growth") +
+  ylim(0, 400) +
+  theme_classic() +
+  theme(legend.position = "none")
+
+## Get number of OG's in the treated and untreated pots
+## Then make a graph of the number of OG's per treatment
+
+TreatedOG <- sum(subset(est_data, TreatmentStatus == 'Treated')$OG_count)
+  
+UntreatedOG <- sum(subset(est_data, TreatmentStatus == 'Untreated')$OG_count)
+  
+NumOG <- c(TreatedOG, UntreatedOG)
+  
+NumOGbyTreatment <- data.frame(Treatment, NumOG)
+
+ggplot(NumMOGByTreatment, aes(x = Treatment, y = NumOG)) +
+  geom_bar(stat = "identity", color = 'black', aes(fill = Treatment)) +
+  ylab("Number of old growth") +
+  ylim(0, 250) +
+  theme_classic() +
+  theme(legend.position = "none")
+
+## Makes a graph showing the number of MOG per ha per plot
+
+TreatedMOGperha <- sum(subset(est_data, TreatmentStatus == 'Treated')$MOGperha)
+
+UntreatedMOGperha <- sum(subset(est_data, TreatmentStatus == 'Untreated')$MOGperha)
+
+NumMOGperha <- c(TreatedMOGperha, UntreatedMOGperha)
+
+NumMOGperhaByTreatment <- data.frame(Treatment, NumMOGperha)
+
+ggplot(NumMOGByTreatment, aes(x = Treatment, y = NumMOGperha)) +
+  geom_bar(stat = "identity", color = 'black', aes(fill = Treatment)) +
+  ylab("Mature old growth density") +
+  ylim(0, 1000) +
+  theme_classic() +
+  theme(legend.position = "none")
+
 -------------------------------------------------------------------------------------------------------------
 
+## OTHER COOL GRAPHS 
+  
+  
 ## OG and MOG by plot
   
 ## I'm not sure how this works but here's where I got the code from:
@@ -283,8 +341,25 @@ ggplot(NumMOGByTreatment, aes(x = Treatment, y = NumMOG)) +
 
 OGvsMOG <- melt(est_data[,c('PlotName','OG_count','MOG_count')],id.vars = 1)
   
-ggplot(OGvsMOG ,aes(x = PlotName, y = value)) + 
+ggplot(OGvsMOG , aes(x = PlotName, y = value)) + 
   geom_bar(aes(fill = variable), stat = "identity", color = 'black', position = "dodge") +
+  xlab("Plot") +
+  ylab("Number of trees") +
+  ylim(0, 200) +
+  scale_fill_manual(values=c("yellow", "blue"), labels = c('Old Growth', 'Mature Old Growth')) +
+  theme_classic() +
+  theme(legend.title = element_blank())
+
+## OG and MOG by plot but its a stacked bar graph
+
+MOGMinusOG <- est_data$MOG_count - est_data$OG_count
+
+est_data$MOGMinusOG <- MOGMinusOG
+
+OGvsMOGpart2 <- melt(est_data[,c('PlotName','MOG_count','MOGMinusOG')],id.vars = 1)
+
+ggplot(est_data, aes(x = PlotName, y = , fill = position)) + 
+  geom_bar(position = 'stack', stat = "identity") +
   xlab("Plot") +
   ylab("Number of trees") +
   ylim(0, 200) +

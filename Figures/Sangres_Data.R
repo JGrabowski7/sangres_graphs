@@ -349,11 +349,11 @@ est_data$MOGMinusOG <- MOGMinusOG
 
 OGvsMOGpart2 <- melt(est_data[,c('PlotName','MOG_count','MOGMinusOG')],id.vars = 1)
 
-ggplot(est_data, aes(x = PlotName, y = , fill = position)) + 
+ggplot(OGvsMOGpart2, aes(x = PlotName, y = value, fill = variable)) + 
   geom_bar(position = 'stack', stat = "identity") +
   xlab("Plot") +
   ylab("Number of trees") +
-  ylim(0, 200) +
+  ylim(0, 500) +
   scale_fill_manual(values=c("yellow", "blue"), labels = c('Old Growth', 'Mature Old Growth')) +
   theme_classic() +
   theme(legend.title = element_blank())

@@ -18,6 +18,7 @@ SFF2 <- read_excel ("C:/Users/cjmay/Documents/GitHub/sangres_graphs/Data/sff2 es
 SFF3 <- read_excel ("C:/Users/cjmay/Documents/GitHub/sangres_graphs/Data/sff3 establishment data.xlsx")
 SFF5 <- read_excel ("C:/Users/cjmay/Documents/GitHub/sangres_graphs/Data/sff5 establishment data 2024.xlsx")
 SFF8 <- read_excel ("C:/Users/cjmay/Documents/GitHub/sangres_graphs/Data/sff8 establishment data.xlsx")
+SFF9 <- read_excel ("C:/Users/cjmay/Documents/GitHub/sangres_graphs/Data/sff8 establishment data.xlsx")
 SFF10 <- read_excel("C:/Users/cjmay/Documents/GitHub/sangres_graphs/Data/sff10 initial 2024 data.xlsx")
 
 # I'm just gonna add this so it's easier for me to run code - Jonathan
@@ -29,6 +30,7 @@ SFF2 <- read_excel("S:/Ecology/Student_folders_&_files/Jonathan 2024/sangres_gra
 SFF3 <- read_excel("S:/Ecology/Student_folders_&_files/Jonathan 2024/sangres_graphs/Data/sff3 establishment data.xlsx")
 SFF5 <- read_excel("S:/Ecology/Student_folders_&_files/Jonathan 2024/sangres_graphs/Data/sff5 establishment data 2024.xlsx")
 SFF8 <- read_excel("S:/Ecology/Student_folders_&_files/Jonathan 2024/sangres_graphs/Data/sff8 establishment data.xlsx")
+SFF9 <- read_excel("S:/Ecology/Student_folders_&_files/Jonathan 2024/sangres_graphs/Data/sff9 establishment data.xlsx")
 SFF10 <- read_excel("S:/Ecology/Student_folders_&_files/Jonathan 2024/sangres_graphs/Data/sff10 initial 2024 data.xlsx")
   
 #Fix janky column name in SFF2
@@ -43,6 +45,7 @@ SFF2$Tree_num = paste0('SFF2-', SFF2$Tree_num)
 SFF3$Tree_num = paste0('SFF3-', SFF3$Tree_num)
 SFF5$Tree_num = paste0('SFF5-', SFF5$Tree_num)
 SFF8$Tree_num = paste0('SFF8-', SFF8$Tree_num)
+SFF9$Tree_num = paste0('SFF9-', SFF9$Tree_num)
 SFF10$Tree_num = paste0('SFF10-', SFF10$Tree_num)
 
 #Add plot number to data
@@ -53,6 +56,7 @@ SFF2$PlotName <- "SFF2"
 SFF3$PlotName <- "SFF3"
 SFF5$PlotName <- "SFF5"
 SFF8$PlotName <- "SFF8"
+SFF9$PlotName <- "SFF9"
 SFF10$PlotName <- "SFF10"
 
 #Add treatment status
@@ -64,6 +68,7 @@ SFF2$TreatmentStatus <- "Untreated"
 SFF3$TreatmentStatus <- "Untreated"
 SFF5$TreatmentStatus <- "Treated"
 SFF8$TreatmentStatus <- "Treated"
+SFF9$TreatmentStatus <- "Untreated"
 SFF10$TreatmentStatus <- "Treated"
 
 #Add plot size
@@ -74,6 +79,7 @@ SFF2$PlotSize <- 1
 SFF3$PlotSize <- 0.25
 SFF5$PlotSize <- 0.25
 SFF8$PlotSize <- 1
+SFF9$PlotSize <- 0.25
 SFF10$PlotSize <- 0.25
   
 #Select columns of interest (I'm begging someone to write a loop, this is so embarrasing)
@@ -94,10 +100,12 @@ SFF3 <- SFF3 %>%
   select(PlotName, PlotSize, TreatmentStatus, Tree_num, Species, Condition, DBH, OG, Notes)
 SFF5 <- SFF5 %>%
   select(PlotName, PlotSize, TreatmentStatus, Tree_num, Species, Condition, DBH, OG,  Notes)
+SFF9 <- SFF9 %>%
+  select(PlotName, PlotSize, TreatmentStatus, Tree_num, Species, Condition, DBH, OG,  Notes)
 
 #Okay well, now we merge all the plots into one dataframe
 SFS4$Condition <- as.numeric(SFS4$Condition)
-merged_plots <- bind_rows(SFS4, BTN4, SFF1, SFF10, SFF8, SFF2, SFF3, SFF5)
+merged_plots <- bind_rows(SFS4, BTN4, SFF1, SFF10, SFF8, SFF2, SFF3, SFF5, SFF9)
 
 #Now we add a column to define MOG as Y or NA
 merged_plots <- merged_plots %>%
@@ -206,7 +214,7 @@ MOGperHectare <- est_data$MOG_count / est_data$PlotSize
 
 est_data$MOGperha <- MOGperHectare 
 
-ggplot(est_data, aes(x= reorder(PlotName, MOGperHA), y= MOGperHA)) +
+ggplot(est_data, aes(x= reorder(PlotName, MOGperha), y= MOGperha)) +
   geom_bar(stat="identity", color = 'black', aes(fill = TreatmentStatus)) +
   xlab("Plot") +
   ylab("Mature old growth density (trees per ha)") +
@@ -325,7 +333,7 @@ NumMOGperha <- c(TreatedMOGperha, UntreatedMOGperha)
 
 NumMOGperhaByTreatment <- data.frame(Treatment, NumMOGperha)
 
-ggplot(NumMOGByTreatment, aes(x = Treatment, y = NumMOGperha)) +
+ggplot(NumMOGperhaByTreatment, aes(x = Treatment, y = NumMOGperha)) +
   geom_bar(stat = "identity", color = 'black', aes(fill = Treatment)) +
   ylab("Mature old growth density") +
   ylim(0, 1000) +
@@ -339,15 +347,15 @@ ggplot(NumMOGByTreatment, aes(x = Treatment, y = NumMOGperha)) +
   
   
 ## OG and MOG by plot
-  
-## I'm not sure how this works but here's where I got the code from:
-  ##https://stackoverflow.com/questions/10212106/creating-grouped-bar-plot-of-multi-column-data-in-r
 
 TreatedPlotName <- subset(est_data, TreatmentStatus == "Treated")$PlotName
 TreatedMOG <- subset(est_data, TreatmentStatus == "Treated")$MOG_count
 TreatedOG <- subset(est_data, TreatmentStatus == "Treated")$OG_count
 
 Treated_MOG_OG <- data.frame(TreatedPlotName, TreatedMOG, TreatedOG)
+
+## I'm not sure how this works but here's where I got the code from:
+##https://stackoverflow.com/questions/10212106/creating-grouped-bar-plot-of-multi-column-data-in-r
 
 T_MOG_OG <- melt(Treated_MOG_OG[,c('TreatedPlotName','TreatedOG','TreatedMOG')],id.vars = 1)
 
@@ -392,7 +400,7 @@ OG_MOG <- melt(est_data[,c('PlotName','OG_count','MOG_count')],id.vars = 1)
 
 ## Can you facet_wrap or facet_grid here???
 
-ggplot(OGvsMOG , aes(x = PlotName, y = value)) + 
+ggplot(OG_MOG , aes(x = PlotName, y = value)) + 
   geom_bar(aes(fill = variable), stat = "identity", color = 'black', position = "dodge") +
   xlab("Plot") +
   ylab("Number of trees") +

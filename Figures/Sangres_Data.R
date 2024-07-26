@@ -357,9 +357,14 @@ T_MOG_OG_Plot <- ggplot(T_MOG_OG, aes(x = TreatedPlotName, y = value)) +
                   xlab("") +
                   ylab("Number of trees") +
                   ylim(0, 200) +
-                  scale_fill_manual(values=c("#4d7358", "#9ed670"), labels = c('Old Growth', 'Mature Old Growth')) +
+                  scale_fill_manual(values=c("#4d7358", "#9ed670")) +
                   theme_classic() +
-                  theme(legend.title = element_blank())
+                  scale_color_continuous(guide = guide_legend(override.aes = list(alpha = 0) ) ) +
+                  scale_linetype(guide = guide_legend(override.aes = list(alpha = 0) ) )+
+                  theme(legend.title = element_text(color = "transparent"),
+                          legend.text = element_text(color = "transparent"),
+                          legend.key = element_rect(fill = "transparent")
+    ## Need to find a way to remove the legend but keep same dimensions
 
 UntreatedPlotName <- subset(est_data, TreatmentStatus == "Untreated")$PlotName
 UntreatedMOG <- subset(est_data, TreatmentStatus == "Untreated")$MOG_count
@@ -396,9 +401,7 @@ ggplot(OGvsMOG , aes(x = PlotName, y = value)) +
   theme_classic() +
   theme(legend.title = element_blank())
 
-
-
-## OG and MOG by plot but its a stacked bar graph
+## OG and MOG by plot but its a stacked bar graph; I don't like it tbh
 
 MOGMinusOG <- est_data$MOG_count - est_data$OG_count
 

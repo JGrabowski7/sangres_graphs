@@ -373,6 +373,7 @@ T_MOG_OG_Plot <- ggplot(T_MOG_OG, aes(x = TreatedPlotName, y = value)) +
                           legend.text = element_text(color = "transparent"),
                           legend.key = element_rect(fill = "transparent"))
     ## Need to find a way to remove the legend but keep same dimensions
+    ##https://stackoverflow.com/questions/42438450/make-legend-invisible-but-keep-figure-dimensions-and-margins-the-same
 
 UntreatedPlotName <- subset(est_data, TreatmentStatus == "Untreated")$PlotName
 UntreatedMOG <- subset(est_data, TreatmentStatus == "Untreated")$MOG_count

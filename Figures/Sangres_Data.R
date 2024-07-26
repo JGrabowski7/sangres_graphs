@@ -12,15 +12,12 @@ library(dplyr)
 SFS4 <- read_excel ("C:/Users/cjmay/Documents/GitHub/sangres_graphs/Data/sfs4 bible 2024.xlsx")
 #NOTE: should get BTN4 species as well
 BTN4 <- read_excel ("C:/Users/cjmay/Documents/GitHub/sangres_graphs/Data/btn4 revisit data 2024.xlsx")
-BTN4dbh <- read_excel ("C:/Users/cjmay/Documents/GitHub/sangres_graphs/Data/btn4 access for C.xlsx")
 SFF1 <- read_excel ("C:/Users/cjmay/Documents/GitHub/sangres_graphs/Data/sff1 establishment data.xlsx")
 SFF2 <- read_excel ("C:/Users/cjmay/Documents/GitHub/sangres_graphs/Data/sff2 establishment 2024 data.xlsx")
 SFF3 <- read_excel ("C:/Users/cjmay/Documents/GitHub/sangres_graphs/Data/sff3 establishment data.xlsx")
 SFF5 <- read_excel ("C:/Users/cjmay/Documents/GitHub/sangres_graphs/Data/sff5 establishment data 2024.xlsx")
 SFF8 <- read_excel ("C:/Users/cjmay/Documents/GitHub/sangres_graphs/Data/sff8 establishment data.xlsx")
 SFF10 <- read_excel("C:/Users/cjmay/Documents/GitHub/sangres_graphs/Data/sff10 initial 2024 data.xlsx")
-
-
 
 # I'm just gonna add this so it's easier for me to run code - Jonathan
 
@@ -46,12 +43,6 @@ SFF3$Tree_num = paste0('SFF3-', SFF3$Tree_num)
 SFF5$Tree_num = paste0('SFF5-', SFF5$Tree_num)
 SFF8$Tree_num = paste0('SFF8-', SFF8$Tree_num)
 SFF10$Tree_num = paste0('SFF10-', SFF10$Tree_num)
-
-#do a quick n dirty join of BTN4 DBH & Species files
-BTN4dbh$Tree_num <- BTN4dbh$TreeID
-BTN4 <- left_join(BTN4, BTN4dbh, by = "Tree_num")
-BTN4$Species <- BTN4$SpeciesID
-BTN4$Notes<-BTN4$Notes.x
 
 #Add plot number to data
 SFS4$PlotName <- "SFS4"
@@ -356,14 +347,27 @@ MOGMinusOG <- est_data$MOG_count - est_data$OG_count
 
 est_data$MOGMinusOG <- MOGMinusOG
 
-OGvsMOGpart2 <- melt(est_data[,c('PlotName','MOG_count','MOGMinusOG')],id.vars = 1)
+OGvsMOGpart2 <- melt(est_data[,c('PlotName','OG_count','MOGMinusOG')],id.vars = 1)
 
 ggplot(OGvsMOGpart2, aes(x = PlotName, y = value, fill = variable)) + 
   geom_bar(position = 'stack', stat = "identity") +
   xlab("Plot") +
   ylab("Number of trees") +
-  ylim(0, 500) +
-  scale_fill_manual(values=c("yellow", "blue"), labels = c('Old Growth', 'Mature Old Growth')) +
+  ylim(0, 300) +
+  scale_fill_manual(values=c("yellow", "blue"), labels = c('Mature Old Growth', 'Old Growth')) +
+  theme_classic() +
+  theme(legend.title = element_blank())
+
+## MOG and TPH stacked bar graph
+
+MOGPHvsTPH<- melt(est_data[,c('PlotName','MOGperha','TPH')],id.vars = 1)
+
+ggplot(MOGPHvsTPH, aes(x = PlotName, y = value, fill = variable)) + 
+  geom_bar(position = 'stack', stat = "identity") +
+  xlab("Plot") +
+  ylab("Trees per ha") +
+  ylim(0, 2000) +
+  scale_fill_manual(values=c(#fb2e01, ""), labels = c('MOG', 'All trees')) +
   theme_classic() +
   theme(legend.title = element_blank())
 
@@ -374,48 +378,26 @@ ggplot(OGvsMOGpart2, aes(x = PlotName, y = value, fill = variable)) +
   #all trees by plot (species-color-coded)
   ggplot(merged_plots, aes(x=DBH)) + geom_histogram()
 # Change the width of bins
-ggplot(merged_plots, aes(x=DBH, fill = Species)) + 
-  scale_fill_manual(values=c("#C3B1E1","#C21E56", "#FFC0CB", "#9F2B68", "#FFD700", "#2E8B57", "#89CFF0", "#5D3FD3", "#CC5500", "#E3963E", "#AFE1AF", "grey"))+
-  #scale_color_manual(values = c("grey40","grey40","grey40","grey40" ,"grey40","grey40","grey40","grey40","grey40","grey40"))+
-  geom_histogram(binwidth=4)+
+ggplot(merged_plots, aes(x=DBH, fill = Species, color = Species)) + 
+  geom_histogram(binwidth=2)+
   xlab("DBH (cm)")+
-  facet_wrap(~TreatmentStatus + PlotName + PlotSize, ncol = 5 )+
-  theme_minimal()+
-  theme(strip.text = element_text(size =15))
+  facet_wrap(~PlotName)
 
 #same but facet by treatment status
 #all trees by plot (species-color-coded)
 ggplot(merged_plots, aes(x=DBH)) + geom_histogram()
 # Change the width of bins
-ggplot(merged_plots, aes(x=DBH, fill = Species, color = Species)) +
-scale_fill_manual(values=c("#C3B1E1","#C21E56", "#FFC0CB", "#9F2B68", "#FFD700", "#2E8B57", "#89CFF0", "#5D3FD3", "#CC5500", "#E3963E", "#AFE1AF", "grey"))+
-  scale_color_manual(values = c("grey40","grey40","grey40","grey40", "grey40","grey40","grey40","grey40", "grey40","grey40","grey40","grey40" ))+
+ggplot(merged_plots, aes(x=DBH, fill = Species, color = Species)) + 
   geom_histogram(binwidth=2)+
   xlab("DBH (cm)")+
-  facet_wrap(~TreatmentStatus)+
-  theme_minimal()+
-  theme(strip.text = element_text(size =15))
+  facet_wrap(~TreatmentStatus)
 
-
-#rename condition codes with words that make sense
-merged_plots <- merged_plots %>%
-  mutate(Cond = case_when(Condition == 1 ~ "Live", 
-                          Condition == 2 | Condition == 5 | Condition == 6 ~ "Dead",
-                          Condition == 3 | Condition == 4 | Condition == 7 ~ "DALB",
-                          Condition == 8 | Condition == 9 | Condition == 10 | Condition == 11 ~"Missing"))
-
-#create condition plot faceted by treatment status with nice logical color scheme
-merged_plots$Condition <- as.factor(merged_plots$Cond)
+merged_plots$Condition <- as.factor(merged_plots$Condition)
 #all trees by plot (live vs. dead)
 ggplot(merged_plots, aes(x=DBH)) + geom_histogram()
 # Change the width of bins
-ggplot(merged_plots, aes(x=DBH, fill = Cond, color = Cond)) + 
-scale_fill_manual(values=c("#e8bb61", "#c7505c", "#8ccfa8", "#56B4E9"))+
-  scale_color_manual(values = c("grey40","grey40","grey40","grey40"))+
+ggplot(merged_plots, aes(x=DBH, fill = Condition, color = Condition)) + 
   geom_histogram(binwidth=2)+
   xlab("DBH (cm)")+
-  facet_wrap(~TreatmentStatus)+
-  theme_minimal()+
-  theme(strip.text = element_text(size =15))
-
-
+  facet_wrap(~TreatmentStatus)
+  

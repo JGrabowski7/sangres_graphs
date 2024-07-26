@@ -4,6 +4,7 @@ library(ggplot2)
 library(reshape2)
 library(readxl)
 library(dplyr)
+library(gridExtra)
 
 
 ###CJM's data prep 
@@ -342,17 +343,60 @@ ggplot(NumMOGByTreatment, aes(x = Treatment, y = NumMOGperha)) +
 ## I'm not sure how this works but here's where I got the code from:
   ##https://stackoverflow.com/questions/10212106/creating-grouped-bar-plot-of-multi-column-data-in-r
 
-OGvsMOG <- melt(est_data[,c('PlotName','OG_count','MOG_count')],id.vars = 1)
-  
+TreatedPlotName <- subset(est_data, TreatmentStatus == "Treated")$PlotName
+TreatedMOG <- subset(est_data, TreatmentStatus == "Treated")$MOG_count
+TreatedOG <- subset(est_data, TreatmentStatus == "Treated")$OG_count
+
+Treated_MOG_OG <- data.frame(TreatedPlotName, TreatedMOG, TreatedOG)
+
+T_MOG_OG <- melt(Treated_MOG_OG[,c('TreatedPlotName','TreatedOG','TreatedMOG')],id.vars = 1)
+
+T_MOG_OG_Plot <- ggplot(T_MOG_OG, aes(x = TreatedPlotName, y = value)) +
+                  geom_bar(aes(fill = variable), stat = "identity", color = 'black', position = "dodge") +
+                  ggtitle("Treated") +
+                  xlab("") +
+                  ylab("Number of trees") +
+                  ylim(0, 200) +
+                  scale_fill_manual(values=c("#4d7358", "#9ed670"), labels = c('Old Growth', 'Mature Old Growth')) +
+                  theme_classic() +
+                  theme(legend.title = element_blank())
+
+UntreatedPlotName <- subset(est_data, TreatmentStatus == "Untreated")$PlotName
+UntreatedMOG <- subset(est_data, TreatmentStatus == "Untreated")$MOG_count
+UntreatedOG <- subset(est_data, TreatmentStatus == "Untreated")$OG_count
+
+Untreated_MOG_OG <- data.frame(UntreatedPlotName, UntreatedMOG, UntreatedOG)
+
+UnT_MOG_OG <- melt(Untreated_MOG_OG[,c('UntreatedPlotName','UntreatedOG','UntreatedMOG')],id.vars = 1)
+
+UnT_MOG_OG_Plot <- ggplot(UnT_MOG_OG, aes(x = UntreatedPlotName, y = value)) +
+                    geom_bar(aes(fill = variable), stat = "identity", color = 'black', position = "dodge") +
+                    ggtitle("Untreated") +
+                    xlab("") +
+                    ylab("Number of trees") +
+                    ylim(0, 200) +
+                    scale_fill_manual(values=c("#4d7358", "#9ed670"), labels = c('Old Growth', 'Mature Old Growth')) +
+                    theme_classic() +
+                    theme(legend.title = element_blank())
+
+grid.arrange(T_MOG_OG_Plot, UnT_MOG_OG_Plot, ncol=1)
+
+## Same as above but in one graph, not two
+
+OG_MOG <- melt(est_data[,c('PlotName','OG_count','MOG_count')],id.vars = 1)
+
+## Can you facet_wrap or facet_grid here???
+
 ggplot(OGvsMOG , aes(x = PlotName, y = value)) + 
   geom_bar(aes(fill = variable), stat = "identity", color = 'black', position = "dodge") +
-  facet_grid(vars(est_data$TreatmentStatus)) +
   xlab("Plot") +
   ylab("Number of trees") +
   ylim(0, 200) +
   scale_fill_manual(values=c("#4d7358", "#9ed670"), labels = c('Old Growth', 'Mature Old Growth')) +
   theme_classic() +
   theme(legend.title = element_blank())
+
+
 
 ## OG and MOG by plot but its a stacked bar graph
 

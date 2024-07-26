@@ -318,7 +318,7 @@ NumOGbyTreatment <- data.frame(Treatment, NumOG)
 ggplot(NumMOGByTreatment, aes(x = Treatment, y = NumOG)) +
   geom_bar(stat = "identity", color = 'black', aes(fill = Treatment)) +
   ylab("Number of old growth") +
-  ylim(0, 250) +
+  ylim(0, 300) +
   scale_fill_manual(values=c("#00aedb", "#d11141")) +
   theme_classic() +
   theme(legend.position = "none")

@@ -154,6 +154,7 @@ ggplot(est_data, aes(x= reorder(PlotName, PlotSize), y= PlotSize)) +
   geom_bar(stat="identity", color = 'black', aes(fill = TreatmentStatus)) +
   xlab("Plot") +
   ylab("Total area (ha)") +
+  scale_fill_manual(values=c("#00aedb", "#d11141")) +
   theme_classic() +
   theme(legend.title = element_blank())
 
@@ -163,6 +164,7 @@ ggplot(est_data, aes(x= reorder(PlotName, Tree_count), y= Tree_count)) +
   geom_bar(stat="identity", color = 'black', aes(fill = TreatmentStatus)) +
   xlab("Plot") +
   ylab("Number of trees") +
+  scale_fill_manual(values=c("#00aedb", "#d11141")) +
   theme_classic() +
   theme(legend.title = element_blank())
 
@@ -172,6 +174,7 @@ ggplot(est_data, aes(x= reorder(PlotName, MOG_count), y= MOG_count)) +
   geom_bar(stat="identity", color = 'black', aes(fill = TreatmentStatus)) +
   xlab("Plot") +
   ylab("Number of mature old growth") +
+  scale_fill_manual(values=c("#00aedb", "#d11141")) +
   theme_classic() +
   theme(legend.title = element_blank())
 
@@ -181,6 +184,7 @@ ggplot(est_data, aes(x= reorder(PlotName, MOG_live_count), y= MOG_live_count)) +
   geom_bar(stat="identity", color = 'black', aes(fill = TreatmentStatus)) +
   xlab("Plot") +
   ylab("Number of live mature old growth") +
+  scale_fill_manual(values=c("#00aedb", "#d11141")) +
   theme_classic() +
   theme(legend.title = element_blank())
 
@@ -190,6 +194,7 @@ ggplot(est_data, aes(x= reorder(PlotName, OG_count), y= OG_count)) +
   geom_bar(stat="identity", color = 'black', aes(fill = TreatmentStatus)) +
   xlab("Plot") +
   ylab("Number of old growth") +
+  scale_fill_manual(values=c("#00aedb", "#d11141")) +
   ylim(0,200) +
   theme_classic() +
   theme(legend.title = element_blank())
@@ -204,6 +209,7 @@ ggplot(est_data, aes(x= reorder(PlotName, MOGperHA), y= MOGperHA)) +
   geom_bar(stat="identity", color = 'black', aes(fill = TreatmentStatus)) +
   xlab("Plot") +
   ylab("Mature old growth density (trees per ha)") +
+  scale_fill_manual(values=c("#00aedb", "#d11141")) +
   ylim(0,200) +
   theme_classic() +
   theme(legend.title = element_blank())
@@ -228,6 +234,7 @@ AreaByTreatment <- data.frame(Treatment, TotalArea)
 ggplot(AreaByTreatment, aes(x = Treatment, y = TotalArea)) +
   geom_bar(stat = "identity", color = 'black', aes(fill = Treatment)) +
   ylab("Total area") +
+  scale_fill_manual(values=c("#00aedb", "#d11141")) +
   theme_classic() +
   theme(legend.position = "none")
 
@@ -246,6 +253,7 @@ ggplot(NumTreesByTreatment, aes(x = Treatment, y = NumTrees)) +
   geom_bar(stat = "identity", color = 'black', aes(fill = Treatment)) +
   ylab("Number of trees") +
   ylim(0, 4000) +
+  scale_fill_manual(values=c("#00aedb", "#d11141")) +
   theme_classic() +
   theme(legend.position = "none")
 
@@ -264,6 +272,7 @@ ggplot(NumMOGByTreatment, aes(x = Treatment, y = NumMOG)) +
   geom_bar(stat = "identity", color = 'black', aes(fill = Treatment)) +
   ylab("Number of mature old growth") +
   ylim(0, 500) +
+  scale_fill_manual(values=c("#00aedb", "#d11141")) +
   theme_classic() +
   theme(legend.position = "none")
 
@@ -282,6 +291,7 @@ ggplot(NumMOGByTreatment, aes(x = Treatment, y = NumLiveMOG)) +
   geom_bar(stat = "identity", color = 'black', aes(fill = Treatment)) +
   ylab("Number of live mature old growth") +
   ylim(0, 400) +
+  scale_fill_manual(values=c("#00aedb", "#d11141")) +
   theme_classic() +
   theme(legend.position = "none")
 
@@ -300,6 +310,7 @@ ggplot(NumMOGByTreatment, aes(x = Treatment, y = NumOG)) +
   geom_bar(stat = "identity", color = 'black', aes(fill = Treatment)) +
   ylab("Number of old growth") +
   ylim(0, 250) +
+  scale_fill_manual(values=c("#00aedb", "#d11141")) +
   theme_classic() +
   theme(legend.position = "none")
 
@@ -317,6 +328,7 @@ ggplot(NumMOGByTreatment, aes(x = Treatment, y = NumMOGperha)) +
   geom_bar(stat = "identity", color = 'black', aes(fill = Treatment)) +
   ylab("Mature old growth density") +
   ylim(0, 1000) +
+  scale_fill_manual(values=c("#00aedb", "#d11141")) +
   theme_classic() +
   theme(legend.position = "none")
 
@@ -334,10 +346,11 @@ OGvsMOG <- melt(est_data[,c('PlotName','OG_count','MOG_count')],id.vars = 1)
   
 ggplot(OGvsMOG , aes(x = PlotName, y = value)) + 
   geom_bar(aes(fill = variable), stat = "identity", color = 'black', position = "dodge") +
+  facet_grid(vars(est_data$TreatmentStatus)) +
   xlab("Plot") +
   ylab("Number of trees") +
   ylim(0, 200) +
-  scale_fill_manual(values=c("yellow", "blue"), labels = c('Old Growth', 'Mature Old Growth')) +
+  scale_fill_manual(values=c("#4d7358", "#9ed670"), labels = c('Old Growth', 'Mature Old Growth')) +
   theme_classic() +
   theme(legend.title = element_blank())
 
@@ -350,11 +363,11 @@ est_data$MOGMinusOG <- MOGMinusOG
 OGvsMOGpart2 <- melt(est_data[,c('PlotName','OG_count','MOGMinusOG')],id.vars = 1)
 
 ggplot(OGvsMOGpart2, aes(x = PlotName, y = value, fill = variable)) + 
-  geom_bar(position = 'stack', stat = "identity") +
+  geom_bar(position = 'stack', stat = "identity", color = "black") +
   xlab("Plot") +
   ylab("Number of trees") +
   ylim(0, 300) +
-  scale_fill_manual(values=c("yellow", "blue"), labels = c('Mature Old Growth', 'Old Growth')) +
+  scale_fill_manual(values=c("#4d7358", "#9ed670"), labels = c('Mature Old Growth', 'Old Growth')) +
   theme_classic() +
   theme(legend.title = element_blank())
 
@@ -367,7 +380,7 @@ ggplot(MOGPHvsTPH, aes(x = PlotName, y = value, fill = variable)) +
   xlab("Plot") +
   ylab("Trees per ha") +
   ylim(0, 2000) +
-  scale_fill_manual(values=c(#fb2e01, ""), labels = c('MOG', 'All trees')) +
+  scale_fill_manual(values=c("#4d7358", "#9ed670"), labels = c('MOG', 'All trees')) +
   theme_classic() +
   theme(legend.title = element_blank())
 

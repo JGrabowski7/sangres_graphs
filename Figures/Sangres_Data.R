@@ -363,7 +363,7 @@ T_MOG_OG_Plot <- ggplot(T_MOG_OG, aes(x = TreatedPlotName, y = value)) +
                   scale_linetype(guide = guide_legend(override.aes = list(alpha = 0) ) )+
                   theme(legend.title = element_text(color = "transparent"),
                           legend.text = element_text(color = "transparent"),
-                          legend.key = element_rect(fill = "transparent")
+                          legend.key = element_rect(fill = "transparent"))
     ## Need to find a way to remove the legend but keep same dimensions
 
 UntreatedPlotName <- subset(est_data, TreatmentStatus == "Untreated")$PlotName

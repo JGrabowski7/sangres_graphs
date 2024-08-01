@@ -16,9 +16,10 @@ BTN4 <- read_excel ("C:/Users/cjmay/Documents/GitHub/sangres_graphs/Data/btn4 re
 SFF1 <- read_excel ("C:/Users/cjmay/Documents/GitHub/sangres_graphs/Data/sff1 establishment data.xlsx")
 SFF2 <- read_excel ("C:/Users/cjmay/Documents/GitHub/sangres_graphs/Data/sff2 establishment 2024 data.xlsx")
 SFF3 <- read_excel ("C:/Users/cjmay/Documents/GitHub/sangres_graphs/Data/sff3 establishment data.xlsx")
+SFF4 <- read_excel ("C:/Users/cjmay/Documents/GitHub/sangres_graphs/Data/sff4 establishment data.xlsx")
 SFF5 <- read_excel ("C:/Users/cjmay/Documents/GitHub/sangres_graphs/Data/sff5 establishment data 2024.xlsx")
 SFF8 <- read_excel ("C:/Users/cjmay/Documents/GitHub/sangres_graphs/Data/sff8 establishment data.xlsx")
-SFF9 <- read_excel ("C:/Users/cjmay/Documents/GitHub/sangres_graphs/Data/sff8 establishment data.xlsx")
+SFF9 <- read_excel ("C:/Users/cjmay/Documents/GitHub/sangres_graphs/Data/sff9 establishment data.xlsx")
 SFF10 <- read_excel("C:/Users/cjmay/Documents/GitHub/sangres_graphs/Data/sff10 initial 2024 data.xlsx")
 
 # I'm just gonna add this so it's easier for me to run code - Jonathan
@@ -28,6 +29,7 @@ BTN4 <- read_excel("S:/Ecology/Student_folders_&_files/Jonathan 2024/sangres_gra
 SFF1 <- read_excel("S:/Ecology/Student_folders_&_files/Jonathan 2024/sangres_graphs/Data/sff1 establishment data.xlsx")
 SFF2 <- read_excel("S:/Ecology/Student_folders_&_files/Jonathan 2024/sangres_graphs/Data/sff2 establishment 2024 data.xlsx")
 SFF3 <- read_excel("S:/Ecology/Student_folders_&_files/Jonathan 2024/sangres_graphs/Data/sff3 establishment data.xlsx")
+SFF4 <- read_excel("S:/Ecology/Student_folders_&_files/Jonathan 2024/sangres_graphs/Data/sff4 establishment data.xlsx")
 SFF5 <- read_excel("S:/Ecology/Student_folders_&_files/Jonathan 2024/sangres_graphs/Data/sff5 establishment data 2024.xlsx")
 SFF8 <- read_excel("S:/Ecology/Student_folders_&_files/Jonathan 2024/sangres_graphs/Data/sff8 establishment data.xlsx")
 SFF9 <- read_excel("S:/Ecology/Student_folders_&_files/Jonathan 2024/sangres_graphs/Data/sff9 establishment data.xlsx")
@@ -43,6 +45,7 @@ BTN4$Tree_num = paste0('BTN4-', BTN4$Tree_num)
 SFF1$Tree_num = paste0('SFF1-', SFF1$Tree_num)
 SFF2$Tree_num = paste0('SFF2-', SFF2$Tree_num)
 SFF3$Tree_num = paste0('SFF3-', SFF3$Tree_num)
+SFF4$Tree_num = paste0('SFF4-', SFF4$Tree_num)
 SFF5$Tree_num = paste0('SFF5-', SFF5$Tree_num)
 SFF8$Tree_num = paste0('SFF8-', SFF8$Tree_num)
 SFF9$Tree_num = paste0('SFF9-', SFF9$Tree_num)
@@ -54,6 +57,7 @@ BTN4$PlotName <- "BTN4"
 SFF1$PlotName <- "SFF1"
 SFF2$PlotName <- "SFF2"
 SFF3$PlotName <- "SFF3"
+SFF4$PlotName <- "SFF4"
 SFF5$PlotName <- "SFF5"
 SFF8$PlotName <- "SFF8"
 SFF9$PlotName <- "SFF9"
@@ -66,6 +70,7 @@ BTN4$TreatmentStatus <- "Untreated"
 SFF1$TreatmentStatus <- "Treated"
 SFF2$TreatmentStatus <- "Untreated"
 SFF3$TreatmentStatus <- "Untreated"
+SFF4$TreatmentStatus <- "Untreated"
 SFF5$TreatmentStatus <- "Treated"
 SFF8$TreatmentStatus <- "Treated"
 SFF9$TreatmentStatus <- "Untreated"
@@ -77,6 +82,7 @@ BTN4$PlotSize <- 1
 SFF1$PlotSize <- 0.25
 SFF2$PlotSize <- 1
 SFF3$PlotSize <- 0.25
+SFF4$PlotSize <- 0.25
 SFF5$PlotSize <- 0.25
 SFF8$PlotSize <- 1
 SFF9$PlotSize <- 0.25
@@ -90,22 +96,25 @@ BTN4 <- BTN4 %>%
   select(PlotName, PlotSize, TreatmentStatus, Tree_num, Species, Condition, DBH, OG, Notes)
 SFF1 <- SFF1 %>%
   select(PlotName, PlotSize, TreatmentStatus, Tree_num, Species, Condition, DBH, OG, Notes)
-SFF10 <- SFF10 %>%
-  select(PlotName, PlotSize, TreatmentStatus, Tree_num, Species, Condition, DBH, OG, Notes)
-SFF8 <- SFF8 %>%
-  select(PlotName, PlotSize, TreatmentStatus, Tree_num, Species, Condition, DBH, OG, Notes)
 SFF2 <- SFF2 %>%
   select(PlotName, PlotSize, TreatmentStatus, Tree_num, Species, Condition, DBH, OG, Notes)
 SFF3 <- SFF3 %>%
   select(PlotName, PlotSize, TreatmentStatus, Tree_num, Species, Condition, DBH, OG, Notes)
+SFF4 <- SFF4 %>%
+  select(PlotName, PlotSize, TreatmentStatus, Tree_num, Species, Condition, DBH, OG, Notes)
 SFF5 <- SFF5 %>%
   select(PlotName, PlotSize, TreatmentStatus, Tree_num, Species, Condition, DBH, OG,  Notes)
+SFF8 <- SFF8 %>%
+  select(PlotName, PlotSize, TreatmentStatus, Tree_num, Species, Condition, DBH, OG, Notes)
 SFF9 <- SFF9 %>%
   select(PlotName, PlotSize, TreatmentStatus, Tree_num, Species, Condition, DBH, OG,  Notes)
+SFF10 <- SFF10 %>%
+  select(PlotName, PlotSize, TreatmentStatus, Tree_num, Species, Condition, DBH, OG, Notes)
+
 
 #Okay well, now we merge all the plots into one dataframe
 SFS4$Condition <- as.numeric(SFS4$Condition)
-merged_plots <- bind_rows(SFS4, BTN4, SFF1, SFF10, SFF8, SFF2, SFF3, SFF5, SFF9)
+merged_plots <- bind_rows(SFS4, BTN4, SFF1, SFF2, SFF3, SFF4, SFF5, SFF8, SFF9, SFF10)
 
 #Now we add a column to define MOG as Y or NA
 merged_plots <- merged_plots %>%

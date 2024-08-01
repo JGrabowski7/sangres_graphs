@@ -505,3 +505,31 @@ merged_plots$Condition <- as.factor(merged_plots$Cond)
   facet_wrap(~TreatmentStatus)+
   theme_minimal()+
   theme(strip.text = element_text(size =15))
+  
+# num species by plot
+  
+  new_merged_plots <- merged_plots
+  PIPO <- length(which(new_merged_plots$Species == "PIPO"))
+  PIST <- length(which(new_merged_plots$Species == "PIST"))
+  ABCO <- length(which(new_merged_plots$Species == "ABCO"))
+  PSME <- length(which(new_merged_plots$Species == "PSME"))
+  QUGA <- length(which(new_merged_plots$Species == "QUGA"))
+  QUUN <- length(which(new_merged_plots$Species == "QUUN"))
+  JUMO <- length(which(new_merged_plots$Species == "JUMO"))
+  JUSC <- length(which(new_merged_plots$Species == "JUSC"))
+  PIED <- length(which(new_merged_plots$Species == "PIED"))
+  PRVI <- length(which(new_merged_plots$Species == "PRVI"))
+  ACGL <- length(which(new_merged_plots$Species == "ACGL"))
+  POTR <- length(which(new_merged_plots$Species == "POTR"))
+
+  species <- c("PIPO","PIST","ABCO","PSME","QUGA","QUUN","JUMO","JUSC","PIED","PRVI","ACGL","POTR")
+  num_tree_by_sp <- data.frame(species, PIPO, PIST, ABCO, PSME, QUGA, QUUN, JUMO, JUSC, PIED, PRVI, ACGL, POTR)
+  
+  ggplot(merged_plots, aes(x=Species, y = num_tree_by_sp, fill = Species, color = Species)) +
+    scale_fill_manual(values=c("#4EDFC7","#C21E56", "#FFC0CB","#95658B", "#FFD700", "#2E8B57", "#89CFF0","#9F2B68","grey", "#5D3FD3", "#CC5500", "#E3963E", "#AFE1AF", "grey","grey","grey"))+
+    scale_color_manual(values = c("grey40","grey40","grey40","grey40", "grey40","grey40","grey40","grey40", "grey40","grey40","grey40","grey40", "grey40","grey40","grey40" ))+
+    geom_bar(stat = "identity" )+
+    xlab("DBH (cm)")+
+    facet_wrap(~PlotName)+
+    theme_minimal()+
+    theme(strip.text = element_text(size =15))

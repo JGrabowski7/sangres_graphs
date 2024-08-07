@@ -161,6 +161,31 @@ merged_summary$OG_count <- merged_OG$OG_count
 merged_summary$TPH <- merged_summary$Tree_count/merged_summary$PlotSize
 est_data<-merged_summary
 
+# Add tree colors 
+
+add_tree_colors <- function(df){
+  df <- df%>%
+    mutate(color=
+             case_when(Species == "ABCO" ~ "#4EDFC7",
+                       Species == "ACGL" ~ "#C21E56",
+                       Species == "JUMO" ~ "#FFC0CB",
+                       Species == "JUSC" ~ "#95658B",
+                       Species == "PIED" ~ "#FFD700",
+                       Species == "PIPO" ~ "#2E8B57",
+                       Species == "PIST" ~ "#89CFF0",
+                       Species == "PRVI" ~ "#9F2B68",
+                       Species == "PSME" ~ "grey",
+                       Species == "QUGA" ~ "#5D3FD3",
+                       Species == "QUUN" ~ "#CC5500",
+                       Species == "SASC" ~ "#E3963E",
+                       Species == "unknown" ~ "#AFE1AF",
+                       Species == "NA" ~ "grey40"
+                       
+             ))
+  
+}
+
+merged_plots <- add_tree_colors(merged_plots)
 
 ###Okay, now for some treatment level stats
 treatment_summary <- merged_summary %>%
@@ -464,10 +489,11 @@ ggplot(MOGPHvsTPH, aes(x = PlotName, y = value, fill = variable)) +
   
   #all trees by plot (species-color-coded)
 # Change the width of bins
-  ggplot(merged_plots, aes(x=DBH, fill = Species)) + 
-  scale_fill_manual(values=c("#4EDFC7","#C21E56", "#FFC0CB","#95658B", "#FFD700", "#2E8B57", "#89CFF0","#9F2B68","grey", "#5D3FD3", "#CC5500", "#E3963E", "#AFE1AF", "grey","grey","grey"))+
-  #scale_color_manual(values = c("grey40","grey40","grey40","grey40" ,"grey40","grey40","grey40","grey40","grey40","grey40"))+
+  ggplot(merged_plots, aes(x=DBH, fill = Species, color =Species)) +
   geom_histogram(binwidth=4)+
+  #scale_fill_manual(values = merged_plots$color)+
+  scale_fill_manual(values=c("#4EDFC7","#C21E56", "#FFC0CB","#95658B", "#FFD700", "#2E8B57", "#89CFF0","#9F2B68","grey", "#5D3FD3", "#CC5500", "#E3963E", "#AFE1AF", "grey","grey","grey"))+
+  scale_color_manual(values = c("grey40","grey40","grey40","grey40" ,"grey40","grey40","grey40","grey40","grey40","grey40", "grey40"))+
   xlab("DBH (cm)")+
 facet_wrap(~TreatmentStatus + PlotName + PlotSize, ncol = 5 )+
   theme_minimal()+

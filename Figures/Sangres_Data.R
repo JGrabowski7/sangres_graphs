@@ -557,3 +557,26 @@ merged_plots$Condition <- as.factor(merged_plots$Cond)
     theme_minimal()+
     theme(axis.text.x=element_text(angle = 90, vjust = 0.5), axis.ticks.x=element_blank())+
     theme(legend.text = element_text(size=15), legend.title =element_blank(), legend.position = c(0.9, 0.9), legend.key.size = unit(0.4, 'in')) 
+    
+   
+  
+  #Jonathan check out this code.  It allows us to set a standard color for each species while keeping the legend displaying the species. 
+   ggplot(merged_plots, aes(x=Species, fill = Species)) +
+      geom_bar(stat = "count" )+
+      #scale_fill_identity()+
+      scale_fill_manual(values = c("ABCO" = "#4EDFC7", "ACGL" = "#C21E56",  "JUMO" = "#FFC0CB", "JUSC" = "#95658B",
+                          "PIED" = "#FFD700",
+                          "PIPO" = "#2E8B57",
+                            "PIST" = "#89CFF0",
+                           "PRVI" = "#9F2B68",
+                          "PSME" = "#5D3FD3",
+                            "QUGA" = "#CC5500",
+                        "QUUN" = "#E3963E",
+                          "SASC" = "#AFE1AF",
+                         "unknown"= "#808080" ,
+                          "NA" = "#808080" ))+
+    facet_wrap(~PlotName)+
+      theme_minimal()+
+      theme(axis.text.x=element_blank(), axis.ticks.x=element_blank())
+
+    

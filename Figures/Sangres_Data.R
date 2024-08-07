@@ -37,6 +37,19 @@ SFF8 <- read_excel("S:/Ecology/Student_folders_&_files/Jonathan 2024/sangres_gra
 SFF9 <- read_excel("S:/Ecology/Student_folders_&_files/Jonathan 2024/sangres_graphs/Data/sff9 establishment data.xlsx")
 SFF10 <- read_excel("S:/Ecology/Student_folders_&_files/Jonathan 2024/sangres_graphs/Data/sff10 initial 2024 data.xlsx")
 
+SFS4 <- read_excel("Data/sfs4 bible 2024.xlsx")
+BTN4 <- read_excel("Data/btn4 revisit data 2024.xlsx")
+BTN4dbh <- read_excel ("Data/btn4 access for C.xlsx")
+SFF1 <- read_excel("Data/sff1 establishment data.xlsx")
+SFF2 <- read_excel("Data/sff2 establishment 2024 data.xlsx")
+SFF3 <- read_excel("Data/sff3 establishment data.xlsx")
+SFF4 <- read_excel("Data/sff4 establishment data.xlsx")
+SFF5 <- read_excel("Data/sff5 establishment data 2024.xlsx")
+SFF8 <- read_excel("Data/sff8 establishment data.xlsx")
+SFF9 <- read_excel("Data/sff9 establishment data.xlsx")
+SFF10 <- read_excel("Data/sff10 initial 2024 data.xlsx")
+
+
 #Fix janky column name in SFF2
 names(SFF2)[5] <- paste("DBH")
 
@@ -486,16 +499,16 @@ ggplot(MOGPHvsTPH, aes(x = PlotName, y = value, fill = variable)) +
 
 -------------------------------------------------------------------------------------------------------
 ## Plot-level Histograms & Other fun things Carolina is playing around with
-  
+colors= c("#4EDFC7","#C21E56", "#FFC0CB","#95658B", "#FFD700", "#2E8B57", "#89CFF0","#9F2B68","grey", "#5D3FD3", "#CC5500", "#E3963E", "#AFE1AF", "grey","grey","grey")
   #all trees by plot (species-color-coded)
 # Change the width of bins
-  ggplot(merged_plots, aes(x=DBH, fill = Species, color =Species)) +
+ggplot(merged_plots, aes(x=DBH,fill=Species)) +
   geom_histogram(binwidth=4)+
-  #scale_fill_manual(values = merged_plots$color)+
-  scale_fill_manual(values=c("#4EDFC7","#C21E56", "#FFC0CB","#95658B", "#FFD700", "#2E8B57", "#89CFF0","#9F2B68","grey", "#5D3FD3", "#CC5500", "#E3963E", "#AFE1AF", "grey","grey","grey"))+
-  scale_color_manual(values = c("grey40","grey40","grey40","grey40" ,"grey40","grey40","grey40","grey40","grey40","grey40", "grey40"))+
+  scale_fill_manual(values = colors)+
+  #scale_fill_manual(values=c("#4EDFC7","#C21E56", "#FFC0CB","#95658B", "#FFD700", "#2E8B57", "#89CFF0","#9F2B68","grey", "#5D3FD3", "#CC5500", "#E3963E", "#AFE1AF", "grey","grey","grey"))+
+  #scale_color_manual(values = c("grey40","grey40","grey40","grey40" ,"grey40","grey40","grey40","grey40","grey40","grey40", "grey40"))+
   xlab("DBH (cm)")+
-facet_wrap(~TreatmentStatus + PlotName + PlotSize, ncol = 5 )+
+  facet_wrap(~TreatmentStatus + PlotName + PlotSize, ncol = 5 )+
   theme_minimal()+
   theme(strip.text = element_text(size =8))
 

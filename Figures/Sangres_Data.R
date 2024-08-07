@@ -187,12 +187,12 @@ add_tree_colors <- function(df){
                        Species == "PIPO" ~ "#2E8B57",
                        Species == "PIST" ~ "#89CFF0",
                        Species == "PRVI" ~ "#9F2B68",
-                       Species == "PSME" ~ "grey",
+                       Species == "PSME" ~ "#808080",
                        Species == "QUGA" ~ "#5D3FD3",
                        Species == "QUUN" ~ "#CC5500",
                        Species == "SASC" ~ "#E3963E",
                        Species == "unknown" ~ "#AFE1AF",
-                       Species == "NA" ~ "grey40"
+                       Species == "NA" ~ "#808080"
                        
              ))
   
@@ -499,14 +499,16 @@ ggplot(MOGPHvsTPH, aes(x = PlotName, y = value, fill = variable)) +
 
 -------------------------------------------------------------------------------------------------------
 ## Plot-level Histograms & Other fun things Carolina is playing around with
-colors= c("#4EDFC7","#C21E56", "#FFC0CB","#95658B", "#FFD700", "#2E8B57", "#89CFF0","#9F2B68","grey", "#5D3FD3", "#CC5500", "#E3963E", "#AFE1AF", "grey","grey","grey")
+#colors= c("#4EDFC7","#C21E56", "#FFC0CB","#95658B", "#FFD700", "#2E8B57", "#89CFF0","#9F2B68","grey", "#5D3FD3", "#CC5500", "#E3963E", "#AFE1AF", "grey","grey","grey")
   #all trees by plot (species-color-coded)
 # Change the width of bins
-ggplot(merged_plots, aes(x=DBH,fill=Species)) +
+  merged_plots$color <- as.character(merged_plots$color)
+ggplot(merged_plots, aes(x=DBH,fill=merged_plots$color)) +
   geom_histogram(binwidth=4)+
-  scale_fill_manual(values = colors)+
+  #scale_fill_manual(values = colors)+
   #scale_fill_manual(values=c("#4EDFC7","#C21E56", "#FFC0CB","#95658B", "#FFD700", "#2E8B57", "#89CFF0","#9F2B68","grey", "#5D3FD3", "#CC5500", "#E3963E", "#AFE1AF", "grey","grey","grey"))+
   #scale_color_manual(values = c("grey40","grey40","grey40","grey40" ,"grey40","grey40","grey40","grey40","grey40","grey40", "grey40"))+
+  scale_fill_identity()+
   xlab("DBH (cm)")+
   facet_wrap(~TreatmentStatus + PlotName + PlotSize, ncol = 5 )+
   theme_minimal()+
@@ -514,10 +516,9 @@ ggplot(merged_plots, aes(x=DBH,fill=Species)) +
 
 #same but facet by treatment status
 # Change the width of bins
-  ggplot(merged_plots, aes(x=DBH, fill = Species, color = Species)) +
-    scale_fill_manual(values=c("#4EDFC7","#C21E56", "#FFC0CB","#95658B", "#FFD700", "#2E8B57", "#89CFF0","#9F2B68","grey", "#5D3FD3", "#CC5500", "#E3963E", "#AFE1AF", "grey","grey","grey"))+
-  scale_color_manual(values = c("grey40","grey40","grey40","grey40", "grey40","grey40","grey40","grey40", "grey40","grey40","grey40","grey40", "grey40","grey40","grey40" ))+
+  ggplot(merged_plots, aes(x=DBH, fill = color)) +
   geom_histogram(binwidth=2)+
+  scale_fill_identity()+
   xlab("DBH (cm)")+
   facet_wrap(~TreatmentStatus)+
     theme_minimal()+
@@ -539,6 +540,7 @@ merged_plots$Condition <- as.factor(merged_plots$Cond)
 # Change the width of bins
   ggplot(merged_plots, aes(x=DBH, fill = Cond, color = Cond)) + 
   scale_fill_manual(values=c("#e8bb61", "#c7505c", "#8ccfa8", "#56B4E9"))+
+    theme(legend.text = element_text(size=15), legend.title =element_blank(), legend.position = c(0.9, 0.9), legend.key.size = unit(0.4, 'in')) +
   scale_color_manual(values = c("grey40","grey40","grey40","grey40"))+
   geom_histogram(binwidth=2)+
   xlab("DBH (cm)")+
@@ -548,10 +550,10 @@ merged_plots$Condition <- as.factor(merged_plots$Cond)
   
 # num species by plot
   
-  ggplot(merged_plots, aes(x=Species, fill = Species, color = Species)) +
-    scale_fill_manual(values=c("#4EDFC7","#C21E56", "#FFC0CB","#95658B", "#FFD700", "#2E8B57", "#89CFF0","#9F2B68", "#5D3FD3", "#CC5500", "#E3963E", "#AFE1AF", "grey","grey","grey"))+
-    scale_color_manual(values = c("grey40","grey40","grey40","grey40", "grey40","grey40","grey40","grey40", "grey40","grey40","grey40","grey40", "grey40","grey40","grey40" ))+
+  ggplot(merged_plots, aes(x=Species, fill = color)) +
     geom_bar(stat = "count" )+
+    scale_fill_identity()+
     facet_wrap(~PlotName)+
     theme_minimal()+
-    theme(axis.title.x=element_blank(), axis.text.x=element_blank(), axis.ticks.x=element_blank())
+    theme(axis.text.x=element_text(angle = 90, vjust = 0.5), axis.ticks.x=element_blank())+
+    theme(legend.text = element_text(size=15), legend.title =element_blank(), legend.position = c(0.9, 0.9), legend.key.size = unit(0.4, 'in')) 

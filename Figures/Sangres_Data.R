@@ -234,8 +234,9 @@ ggplot(est_data, aes(x= reorder(PlotName, PlotSize), y= PlotSize)) +
 
 ggplot(est_data, aes(x= reorder(PlotName, Tree_count), y= Tree_count)) +
   geom_bar(stat="identity", color = 'black', aes(fill = TreatmentStatus)) +
-  xlab("Plot") +
+  xlab("") +
   ylab("Number of trees") +
+  ylim(0, 2000) +
   scale_fill_manual(values=c("#00aedb", "#d11141")) +
   theme_classic() +
   theme(legend.title = element_blank())
@@ -244,8 +245,9 @@ ggplot(est_data, aes(x= reorder(PlotName, Tree_count), y= Tree_count)) +
 
 ggplot(est_data, aes(x= reorder(PlotName, MOG_count), y= MOG_count)) +
   geom_bar(stat="identity", color = 'black', aes(fill = TreatmentStatus)) +
-  xlab("Plot") +
+  xlab("") +
   ylab("Number of mature old growth") +
+  ylim(0,200) +
   scale_fill_manual(values=c("#00aedb", "#d11141")) +
   theme_classic() +
   theme(legend.title = element_blank())
@@ -254,8 +256,9 @@ ggplot(est_data, aes(x= reorder(PlotName, MOG_count), y= MOG_count)) +
 
 ggplot(est_data, aes(x= reorder(PlotName, MOG_live_count), y= MOG_live_count)) +
   geom_bar(stat="identity", color = 'black', aes(fill = TreatmentStatus)) +
-  xlab("Plot") +
+  xlab("") +
   ylab("Number of live mature old growth") +
+  ylim(0, 200) +
   scale_fill_manual(values=c("#00aedb", "#d11141")) +
   theme_classic() +
   theme(legend.title = element_blank())
@@ -264,7 +267,7 @@ ggplot(est_data, aes(x= reorder(PlotName, MOG_live_count), y= MOG_live_count)) +
 
 ggplot(est_data, aes(x= reorder(PlotName, OG_count), y= OG_count)) +
   geom_bar(stat="identity", color = 'black', aes(fill = TreatmentStatus)) +
-  xlab("Plot") +
+  xlab("") +
   ylab("Number of old growth") +
   scale_fill_manual(values=c("#00aedb", "#d11141")) +
   ylim(0,200) +
@@ -279,7 +282,7 @@ est_data$MOGperha <- MOGperHectare
 
 ggplot(est_data, aes(x= reorder(PlotName, MOGperha), y= MOGperha)) +
   geom_bar(stat="identity", color = 'black', aes(fill = TreatmentStatus)) +
-  xlab("Plot") +
+  xlab("") +
   ylab("Mature old growth density (trees per ha)") +
   scale_fill_manual(values=c("#00aedb", "#d11141")) +
   ylim(0,200) +
@@ -323,8 +326,9 @@ NumTreesByTreatment <- data.frame(Treatment, NumTrees)
 
 ggplot(NumTreesByTreatment, aes(x = Treatment, y = NumTrees)) +
   geom_bar(stat = "identity", color = 'black', aes(fill = Treatment)) +
+  xlab("") +
   ylab("Number of trees") +
-  ylim(0, 4000) +
+  ylim(0, 5000) +
   scale_fill_manual(values=c("#00aedb", "#d11141")) +
   theme_classic() +
   theme(legend.position = "none")
@@ -342,8 +346,9 @@ NumMOGByTreatment <- data.frame(Treatment, NumMOG)
 
 ggplot(NumMOGByTreatment, aes(x = Treatment, y = NumMOG)) +
   geom_bar(stat = "identity", color = 'black', aes(fill = Treatment)) +
+  xlab("") +
   ylab("Number of mature old growth") +
-  ylim(0, 500) +
+  ylim(0, 600) +
   scale_fill_manual(values=c("#00aedb", "#d11141")) +
   theme_classic() +
   theme(legend.position = "none")
@@ -361,8 +366,9 @@ NumLiveMOGbyTreatment <- data.frame(Treatment, NumLiveMOG)
 
 ggplot(NumMOGByTreatment, aes(x = Treatment, y = NumLiveMOG)) +
   geom_bar(stat = "identity", color = 'black', aes(fill = Treatment)) +
+  xlab("") +
   ylab("Number of live mature old growth") +
-  ylim(0, 400) +
+  ylim(0, 600) +
   scale_fill_manual(values=c("#00aedb", "#d11141")) +
   theme_classic() +
   theme(legend.position = "none")
@@ -380,6 +386,7 @@ NumOGbyTreatment <- data.frame(Treatment, NumOG)
 
 ggplot(NumMOGByTreatment, aes(x = Treatment, y = NumOG)) +
   geom_bar(stat = "identity", color = 'black', aes(fill = Treatment)) +
+  xlab("") +
   ylab("Number of old growth") +
   ylim(0, 300) +
   scale_fill_manual(values=c("#00aedb", "#d11141")) +
@@ -398,7 +405,8 @@ NumMOGperhaByTreatment <- data.frame(Treatment, NumMOGperha)
 
 ggplot(NumMOGperhaByTreatment, aes(x = Treatment, y = NumMOGperha)) +
   geom_bar(stat = "identity", color = 'black', aes(fill = Treatment)) +
-  ylab("Mature old growth density") +
+  xlab("") +
+  ylab("Mature old growth per hectare") +
   ylim(0, 1000) +
   scale_fill_manual(values=c("#00aedb", "#d11141")) +
   theme_classic() +
@@ -429,12 +437,12 @@ T_MOG_OG_Plot <- ggplot(T_MOG_OG, aes(x = TreatedPlotName, y = value)) +
                   ylab("Number of trees") +
                   ylim(0, 200) +
                   scale_fill_manual(values=c("#4d7358", "#9ed670")) +
-                  theme_classic() +
-                  scale_color_continuous(guide = guide_legend(override.aes = list(alpha = 0) ) ) +
-                  scale_linetype(guide = guide_legend(override.aes = list(alpha = 0) ) )+
-                  theme(legend.title = element_text(color = "transparent"),
-                          legend.text = element_text(color = "transparent"),
-                          legend.key = element_rect(fill = "transparent"))
+                  theme_classic()
+                  #scale_color_continuous(guide = guide_legend(override.aes = list(alpha = 0) ) ) +
+                  #scale_linetype(guide = guide_legend(override.aes = list(alpha = 0) ) )+
+                  #theme(legend.title = element_text(color = "transparent"),
+                          #legend.text = element_text(color = "transparent"),
+                          #legend.key = element_rect(fill = "transparent"))
     ## Need to find a way to remove the legend but keep same dimensions
     ##https://stackoverflow.com/questions/42438450/make-legend-invisible-but-keep-figure-dimensions-and-margins-the-same
 
@@ -494,11 +502,10 @@ ggplot(OGvsMOGpart2, aes(x = PlotName, y = value, fill = variable)) +
 
 MOGPHvsTPH<- melt(est_data[,c('PlotName','MOGperha','TPH')],id.vars = 1)
 
-ggplot(MOGPHvsTPH, aes(x = PlotName, y = value, fill = variable)) + 
-  geom_bar(position = 'stack', stat = "identity") +
+ggplot(MOGPHvsTPH, aes(x = PlotName, y = value, fill = reorder("TPH", "MOGperha"))) + 
+  geom_bar(position = "fill", stat = "identity", color = "black") +
   xlab("Plot") +
   ylab("Trees per ha") +
-  ylim(0, 2000) +
   scale_fill_manual(values=c("#4d7358", "#9ed670"), labels = c('MOG', 'All trees')) +
   theme_classic() +
   theme(legend.title = element_blank())
@@ -571,19 +578,43 @@ merged_plots$Condition <- as.factor(merged_plots$Cond)
    ggplot(merged_plots, aes(x=Species, fill = Species)) +
       geom_bar(stat = "count" )+
       #scale_fill_identity()+
-      scale_fill_manual(values = c("ABCO" = "#4EDFC7", "ACGL" = "#C21E56",  "JUMO" = "#FFC0CB", "JUSC" = "#95658B",
-                          "PIED" = "#FFD700",
-                          "PIPO" = "#2E8B57",
-                            "PIST" = "#89CFF0",
-                           "PRVI" = "#9F2B68",
-                          "PSME" = "#5D3FD3",
-                            "QUGA" = "#CC5500",
-                        "QUUN" = "#E3963E",
-                          "SASC" = "#AFE1AF",
-                         "unknown"= "#808080" ,
-                          "NA" = "#808080" ))+
+      scale_fill_manual(values = c("ABCO" = "#4EDFC7", 
+                                   "ACGL" = "#C21E56",  
+                                   "JUMO" = "#FFC0CB", 
+                                   "JUSC" = "#95658B",
+                                   "PIED" = "#FFD700",
+                                   "PIPO" = "#2E8B57",
+                                   "PIST" = "#89CFF0",
+                                   "PRVI" = "#9F2B68",
+                                   "PSME" = "#5D3FD3",
+                                   "QUGA" = "#CC5500",
+                                   "QUUN" = "#E3963E",
+                                   "SASC" = "#AFE1AF",
+                                   "unknown"= "#808080" ,
+                                   "NA" = "#808080" ))+
     facet_wrap(~PlotName)+
       theme_minimal()+
       theme(axis.text.x=element_blank(), axis.ticks.x=element_blank())
 
-    
+# Stacked percent bar graph of number of species
+   
+ggplot(merged_plots, aes(x=Species, fill = Species)) +
+ geom_bar(stat = "count", position = "fill" )+
+ #scale_fill_identity()+
+ scale_fill_manual(values = c("ABCO" = "#4EDFC7", 
+                              "ACGL" = "#C21E56",  
+                              "JUMO" = "#FFC0CB", 
+                              "JUSC" = "#95658B",
+                              "PIED" = "#FFD700",
+                              "PIPO" = "#2E8B57",
+                              "PIST" = "#89CFF0",
+                              "PRVI" = "#9F2B68",
+                              "PSME" = "#5D3FD3",
+                              "QUGA" = "#CC5500",
+                              "QUUN" = "#E3963E",
+                              "SASC" = "#AFE1AF",
+                              "unknown"= "#808080" ,
+                              "NA" = "#808080" ))+
+ facet_wrap(~PlotName)+
+ theme_minimal()+
+ theme(axis.text.x=element_blank(), axis.ticks.x=element_blank())

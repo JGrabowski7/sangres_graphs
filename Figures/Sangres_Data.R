@@ -500,13 +500,19 @@ ggplot(OGvsMOGpart2, aes(x = PlotName, y = value, fill = variable)) +
 
 ## MOG and TPH stacked bar graph
 
+MOGperHectare <- est_data$MOG_count / est_data$PlotSize
+
+est_data$MOGperha <- MOGperHectare 
+
 MOGPHvsTPH<- melt(est_data[,c('PlotName','MOGperha','TPH')],id.vars = 1)
 
-ggplot(MOGPHvsTPH, aes(x = PlotName, y = value, fill = reorder("TPH", "MOGperha"))) + 
+MOGPHvsTPH$variable <- factor(MOGPHvsTPH$variable, levels=c("TPH", "MOGperha"))
+
+ggplot(MOGPHvsTPH, aes(x = PlotName, y = value, fill = variable)) + 
   geom_bar(position = "fill", stat = "identity", color = "black") +
-  xlab("Plot") +
+  xlab("") +
   ylab("Trees per ha") +
-  scale_fill_manual(values=c("#4d7358", "#9ed670"), labels = c('MOG', 'All trees')) +
+  scale_fill_manual(values=c("#005b96", "#6497b1"), labels = c('All trees', 'MOG')) +
   theme_classic() +
   theme(legend.title = element_blank())
 
@@ -599,7 +605,7 @@ merged_plots$Condition <- as.factor(merged_plots$Cond)
 # Stacked percent bar graph of number of species
    
 ggplot(merged_plots, aes(x=Species, fill = Species)) +
- geom_bar(stat = "count", position = "fill" )+
+ geom_bar(stat = "count")+
  #scale_fill_identity()+
  scale_fill_manual(values = c("ABCO" = "#4EDFC7", 
                               "ACGL" = "#C21E56",  
@@ -616,5 +622,6 @@ ggplot(merged_plots, aes(x=Species, fill = Species)) +
                               "unknown"= "#808080" ,
                               "NA" = "#808080" ))+
  facet_wrap(~PlotName)+
+ xlab("") +
  theme_minimal()+
  theme(axis.text.x=element_blank(), axis.ticks.x=element_blank())

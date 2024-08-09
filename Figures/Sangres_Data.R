@@ -504,15 +504,19 @@ MOGperHectare <- est_data$MOG_count / est_data$PlotSize
 
 est_data$MOGperha <- MOGperHectare 
 
-MOGPHvsTPH<- melt(est_data[,c('PlotName','MOGperha','TPH')],id.vars = 1)
+est_data$NotMOGperha <- est_data$TPH - est_data$MOGperha
 
-MOGPHvsTPH$variable <- factor(MOGPHvsTPH$variable, levels=c("TPH", "MOGperha"))
+MOGPHvsTPH<- melt(est_data[,c('PlotName','MOGperha','NotMOGperha')],id.vars = 1)
+
+MOGPHvsTPH$variable <- factor(MOGPHvsTPH$variable, levels=c("NotMOGperha", "MOGperha"))
+
+MOGPHvsTPH$TreatmentStatus <- est_data$TreatmentStatus
 
 ggplot(MOGPHvsTPH, aes(x = PlotName, y = value, fill = variable)) + 
   geom_bar(position = "fill", stat = "identity", color = "black") +
   xlab("") +
   ylab("Trees per ha") +
-  scale_fill_manual(values=c("#005b96", "#6497b1"), labels = c('All trees', 'MOG')) +
+  scale_fill_manual(values=c("#005b96", "#6497b1"), labels=c("All other trees", "MOG")) +
   theme_classic() +
   theme(legend.title = element_blank())
 

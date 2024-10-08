@@ -42,15 +42,15 @@ SFS4 <- read_excel("Data/sfs4 bible 2024.xlsx")
 BTN4 <- read_excel("Data/btn4 revisit data 2024.xlsx")
 BTN4dbh <- read_excel ("Data/btn4 access for C.xlsx")
 SFF1 <- read_excel("Data/sff1 establishment data.xlsx")
-SFF2 <- read_excel("Data/sff2 establishment 2024 data.xlsx")
+SFF2 <- read_excel("Data/sff2 establishment data.xlsx")
 SFF3 <- read_excel("Data/sff3 establishment data.xlsx")
 SFF4 <- read_excel("Data/sff4 establishment data.xlsx")
-SFF5 <- read_excel("Data/sff5 establishment data 2024.xlsx")
+SFF5 <- read_excel("Data/sff5 establishment data.xlsx")
 SFF6 <- read_excel("Data/sff6 establishment data.xlsx")
 SFF7 <- read_excel("Data/sff7 establishment data.xlsx")
 SFF8 <- read_excel("Data/sff8 establishment data.xlsx")
 SFF9 <- read_excel("Data/sff9 establishment data.xlsx")
-SFF10 <- read_excel("Data/sff10 initial 2024 data.xlsx")
+SFF10 <- read_excel("Data/sff10 establishment data.xlsx")
 
 
 #Fix janky column name in SFF2
@@ -444,8 +444,9 @@ T_MOG_OG_Plot <- ggplot(T_MOG_OG, aes(x = TreatedPlotName, y = value)) +
                   xlab("") +
                   ylab("Number of trees") +
                   ylim(0, 200) +
-                  scale_fill_manual(values=c("#4d7358", "#9ed670")) +
-                  theme_classic()
+                  scale_fill_manual(values=c("#4d7358", "#9ed670"), labels = c('Old Growth', 'Mature Old Growth')) +
+                  theme_classic() +
+                  theme(legend.title = element_blank())
                   #scale_color_continuous(guide = guide_legend(override.aes = list(alpha = 0) ) ) +
                   #scale_linetype(guide = guide_legend(override.aes = list(alpha = 0) ) )+
                   #theme(legend.title = element_text(color = "transparent"),
@@ -535,7 +536,7 @@ ggplot(MOGPHvsTPH, aes(x = PlotName, y = value, fill = variable)) +
   #all trees by plot (species-color-coded)
 # Change the width of bins
   merged_plots$color <- as.character(merged_plots$color)
-ggplot(merged_plots, aes(x=DBH,fill=merged_plots$color)) +
+ggplot(merged_plots, aes(x=DBH), fill=merged_plots$color) +
   geom_histogram(binwidth=4)+
   #scale_fill_manual(values = colors)+
   #scale_fill_manual(values=c("#4EDFC7","#C21E56", "#FFC0CB","#95658B", "#FFD700", "#2E8B57", "#89CFF0","#9F2B68","grey", "#5D3FD3", "#CC5500", "#E3963E", "#AFE1AF", "grey","grey","grey"))+

@@ -6,7 +6,6 @@ library(readxl)
 library(dplyr)
 library(gridExtra)
 
-
 ###CJM's data prep 
 
 #Read in excel sheets.  Probably should be using csvs but I'm lazy.  See how this goes
@@ -202,11 +201,11 @@ add_tree_colors <- function(df){
                        Species == "PIPO" ~ "#2E8B57",
                        Species == "PIST" ~ "#89CFF0",
                        Species == "PRVI" ~ "#9F2B68",
-                       Species == "PSME" ~ "#808080",
-                       Species == "QUGA" ~ "#5D3FD3",
-                       Species == "QUUN" ~ "#CC5500",
-                       Species == "SASC" ~ "#E3963E",
-                       Species == "unknown" ~ "#AFE1AF",
+                       Species == "PSME" ~ "#5D3FD3",
+                       Species == "QUGA" ~ "#CC5500",
+                       Species == "QUUN" ~ "#E3963E",
+                       Species == "SASC" ~ "#AFE1AF",
+                       Species == "unknown" ~ "#808080",
                        Species == "NA" ~ "#808080"
                        
              ))
@@ -524,7 +523,7 @@ MOGPHvsTPH$TreatmentStatus <- est_data$TreatmentStatus
 ggplot(MOGPHvsTPH, aes(x = PlotName, y = value, fill = variable)) + 
   geom_bar(position = "fill", stat = "identity", color = "black") +
   xlab("") +
-  ylab("Trees per ha") +
+  ylab("Trees per ha (%)") +
   scale_fill_manual(values=c("#005b96", "#6497b1"), labels=c("All other trees", "MOG")) +
   theme_classic() +
   theme(legend.title = element_blank())
@@ -532,18 +531,20 @@ ggplot(MOGPHvsTPH, aes(x = PlotName, y = value, fill = variable)) +
 
 -------------------------------------------------------------------------------------------------------
 ## Plot-level Histograms & Other fun things Carolina is playing around with
-#colors= c("#4EDFC7","#C21E56", "#FFC0CB","#95658B", "#FFD700", "#2E8B57", "#89CFF0","#9F2B68","grey", "#5D3FD3", "#CC5500", "#E3963E", "#AFE1AF", "grey","grey","grey")
+#color= c("#4EDFC7","#C21E56", "#FFC0CB","#95658B", "#FFD700", "#2E8B57", "#89CFF0","#9F2B68","grey", "#5D3FD3", "#CC5500", "#E3963E", "#AFE1AF", "grey")
   #all trees by plot (species-color-coded)
 # Change the width of bins
   merged_plots$color <- as.character(merged_plots$color)
-ggplot(merged_plots, aes(x=DBH), fill=merged_plots$color) +
+
+ggplot(merged_plots, aes(x=DBH), fill = merged_plots$color) +
   geom_histogram(binwidth=4)+
-  #scale_fill_manual(values = colors)+
-  #scale_fill_manual(values=c("#4EDFC7","#C21E56", "#FFC0CB","#95658B", "#FFD700", "#2E8B57", "#89CFF0","#9F2B68","grey", "#5D3FD3", "#CC5500", "#E3963E", "#AFE1AF", "grey","grey","grey"))+
+  #scale_fill_manual(values = color)+
+  #scale_fill_manual(values=c("#4EDFC7","#C21E56", "#FFC0CB","#95658B", "#FFD700", "#2E8B57", "#89CFF0","#9F2B68","grey", "#5D3FD3", "#CC5500", "#E3963E", "#AFE1AF", "grey")) +#,"grey","grey"))+
   #scale_color_manual(values = c("grey40","grey40","grey40","grey40" ,"grey40","grey40","grey40","grey40","grey40","grey40", "grey40"))+
   scale_fill_identity()+
   xlab("DBH (cm)")+
-  facet_wrap(~TreatmentStatus + PlotName + PlotSize, ncol = 5 )+
+  #ylim(0, 400) +
+  facet_wrap(~TreatmentStatus + PlotName + PlotSize, ncol = 6)+
   theme_minimal()+
   theme(strip.text = element_text(size =8))
 
@@ -554,10 +555,10 @@ ggplot(merged_plots, aes(x=DBH), fill=merged_plots$color) +
   scale_fill_identity()+
   xlab("DBH (cm)")+
   facet_wrap(~TreatmentStatus)+
-    theme_minimal()+
+  theme_minimal()+
   theme(strip.text = element_text(size =15))
   
-
+unique(merged_plots$Species)
 
 merged_plots$Condition <- as.factor(merged_plots$Condition)
 #rename condition codes with words that make sense

@@ -1,0 +1,636 @@
+---
+title: "Sangres Trees Report 2024"
+output:
+  word_document: default
+  html_document: default
+  pdf_document: default
+date: "2024-10-10"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+## Load packages
+
+library(ggplot2)
+library(reshape2)
+library(readxl)
+library(dplyr)
+library(gridExtra)
+library(stringr)
+
+```
+
+```{R, include = FALSE}
+#Read in master excel sheet (exported from Access).  Probably should be using csvs but I'm lazy.  See how this goes
+all_data<- read_excel ("C:/Users/cjmay/Documents/GitHub/sangres_graphs/Data/Map and Figure Query_20241010.xlsx")
+
+#Add plot number to data
+all_data$Plot<-str_extract(all_data$TreeID, "[^-]+")
+
+#Add treatment status to data
+all_data <- all_data %>%
+  mutate(TreatmentStatus = (case_when(Plot == "SFS4" ~ "Treated",
+                                      Plot == "BTN4" ~ "Untreated",
+                                      Plot == "SFF1" ~ "Treated",
+                                      Plot == "SFF2" ~ "Untreated",
+                                      Plot == "SFF3" ~ "Untreated",
+                                      Plot == "SFF4" ~ "Untreated",
+                                      Plot == "SFF5" ~ "Treated",
+                                      Plot == "SFF6" ~ "Untreated",
+                                      Plot == "SFF7" ~ "Treated",
+                                      Plot == "SFF8" ~ "Treated",
+                                      Plot == "SFF9" ~ "Untreated",
+                                      Plot == "SFF10" ~ "Treated",
+                                     )))
+#Add plot size
+all_data <- all_data %>%
+  mutate(PlotSize = (case_when(Plot == "SFS4" ~ 1,
+                                      Plot == "BTN4" ~ 1,
+                                      Plot == "SFF1" ~ 0.25,
+                                      Plot == "SFF2" ~ 1,
+                                      Plot == "SFF3" ~ 0.25,
+                                      Plot == "SFF4" ~ 0.25,
+                                      Plot == "SFF5" ~ 0.25,
+                                      Plot == "SFF6" ~ 0.25,
+                                      Plot == "SFF7" ~ 0.25,
+                                      Plot == "SFF8" ~ 1,
+                                      Plot == "SFF9" ~ 0.25,
+                                      Plot == "SFF10" ~ 0.25,
+  )))
+
+#select columns of interest
+merged_plots <- all_data %>%
+  select(Plot, PlotSize, TreatmentStatus, TreeID, SpeciesID, Tree_condition, Diameter, Old_growth, Fire_scar, Notes)
+
+
+#Now we add a column to define MOG as Y or NA
+merged_plots <- merged_plots %>%
+  mutate(MOG = case_when(Old_growth == "Y" | Diameter > 30 ~ "Y"))
+             
+#calculate tree counts
+merged_summary <- merged_plots %>%
+  group_by(Plot, PlotSize, TreatmentStatus) %>%
+  summarize(Tree_count = n(), meanDiameter = mean(Diameter, na.rm = TRUE))
+
+#calculate MOG stats
+merged_MOG <- merged_plots %>%
+  filter(MOG == "Y")%>%
+  group_by(Plot, PlotSize, TreatmentStatus)%>%
+  summarize(MOG_count = n())
+
+#calculate live MOG stats
+merged_MOG_live <- merged_plots %>%
+  filter(MOG == "Y" & Tree_condition != 5 & Tree_condition != 2) %>%
+  group_by(Plot, PlotSize, TreatmentStatus) %>%
+  summarize(MOG_live_count = n())
+
+#calculate OG stats
+merged_OG <- merged_plots %>%
+  filter(Old_growth == "Y") %>%
+  group_by(Plot, PlotSize, TreatmentStatus) %>%
+  summarize(OG_count = n())
+
+#merge em all together.  probably a better way to do this, but here we are
+merged_summary$MOG_count <- merged_MOG$MOG_count
+merged_summary$MOG_live_count <- merged_MOG_live$MOG_live_count
+merged_summary$OG_count <- merged_OG$OG_count
+
+#Calculate TPH
+merged_summary$TPH <- merged_summary$Tree_count/merged_summary$PlotSize
+est_data<-merged_summary
+
+# Add tree colors 
+
+add_tree_colors <- function(df){
+  df <- df%>%
+    mutate(color=
+             case_when(SpeciesID == "ABCO" ~ "#4EDFC7",
+                       SpeciesID == "ACGL" ~ "#C21E56",
+                       SpeciesID == "JUMO" ~ "#FFC0CB",
+                       SpeciesID == "JUSC" ~ "#95658B",
+                       SpeciesID == "PIED" ~ "#FFD700",
+                       SpeciesID == "PIPO" ~ "#2E8B57",
+                       SpeciesID == "PIST" ~ "#89CFF0",
+                       SpeciesID == "PRVI" ~ "#9F2B68",
+                       SpeciesID == "POTR" ~ "#F1EAA9",
+                       SpeciesID == "PSME" ~ "#216E90",
+                       SpeciesID == "QUGA" ~ "#CC5500",
+                       SpeciesID == "QUUN" ~ "#E3963E",
+                       SpeciesID == "SASC" ~ "#AFE1AF",
+                       SpeciesID == "unknown"~ "#808080"
+                       
+             ))
+  
+}
+
+merged_plots <- add_tree_colors(merged_plots)
+
+
+```
+
+## Summary Stats
+
+```{r}
+treatment_summary <- merged_summary %>%
+  group_by(TreatmentStatus)%>%
+  summarize(Tree_count = sum(Tree_count), MOG_count = sum(MOG_count), MOG_live_count = sum(MOG_live_count), Surveyed_ha = sum(PlotSize))
+library(knitr)
+kable(treatment_summary)
+```
+
+```{r, include = FALSE}
+## DATA BY PLOT
+
+
+fig1<- ggplot(est_data, aes(x= reorder(Plot, Tree_count), y= Tree_count)) +
+  geom_bar(stat="identity", color = 'black', aes(fill = TreatmentStatus)) +
+  xlab("") +
+  ylab("Tree count") +
+  ylim(0, 2000) +
+  scale_fill_manual(values=c("#e6b855", "#435e55ff")) +
+  theme_classic() +
+  theme(legend.title = element_blank())+
+  ggtitle("Tree count per plot")
+
+
+fig2<- ggplot(est_data, aes(x= reorder(Plot, TPH), y= TPH)) +
+  geom_bar(stat="identity", color = 'black', aes(fill = TreatmentStatus)) +
+  xlab("") +
+  ylab("Trees/ha") +
+  ylim(0, 4000) +
+  scale_fill_manual(values=c("#e6b855", "#435e55ff")) +
+  theme_classic() +
+  theme(legend.title = element_blank())+
+  ggtitle("Tree density by plot")
+
+grid.arrange(fig1,fig2)
+
+## Makes a graph showing the number of MOG sampled per plot
+
+fig3<-ggplot(est_data, aes(x= reorder(Plot, MOG_count), y= MOG_count)) +
+  geom_bar(stat="identity", color = 'black', aes(fill = TreatmentStatus)) +
+  xlab("") +
+  ylab("MOG count") +
+  ylim(0,200) +
+  scale_fill_manual(values=c("#e6b855", "#435e55ff")) +
+  theme_classic() +
+  theme(legend.title = element_blank())+
+  ggtitle("Mature/old growth per plot")
+
+## Makes a graph showing the number of live MOG sampled per plot
+
+fig5<-ggplot(est_data, aes(x= reorder(Plot, MOG_live_count), y= MOG_live_count)) +
+  geom_bar(stat="identity", color = 'black', aes(fill = TreatmentStatus)) +
+  xlab("") +
+  ylab("Live MOG count") +
+  ylim(0, 200) +
+  scale_fill_manual(values=c("#e6b855", "#435e55ff")) +
+  theme_classic() +
+  theme(legend.title = element_blank())+
+  ggtitle("Live mature/old growth count by plot")
+
+est_data$liveMOGdensity<-est_data$MOG_live_count/est_data$PlotSize
+
+fig6<-ggplot(est_data, aes(x= reorder(Plot, liveMOGdensity), y= liveMOGdensity)) +
+  geom_bar(stat="identity", color = 'black', aes(fill = TreatmentStatus)) +
+  xlab("") +
+  ylab("Live MOG density by plot") +
+  ylim(0, 200) +
+  scale_fill_manual(values=c("#e6b855", "#435e55ff")) +
+  theme_classic() +
+  theme(legend.title = element_blank())+
+  ggtitle("Live mature/old growth density by plot")
+
+
+## Makes a graph showing the number of MOG per ha per plot
+
+MOGperHectare <- est_data$MOG_count / est_data$PlotSize
+
+est_data$MOGperha <- MOGperHectare
+
+fig4<-ggplot(est_data, aes(x= reorder(Plot, MOGperha), y= MOGperha)) +
+  geom_bar(stat="identity", color = 'black', aes(fill = TreatmentStatus)) +
+  xlab("") +
+  ylab("MOG per ha") +
+  scale_fill_manual(values=c("#e6b855", "#435e55ff")) +
+  ylim(0,200) +
+  theme_classic() +
+  theme(legend.title = element_blank())+
+  ggtitle("Mature/old growth density by plot")
+```
+
+### Figures by Plot
+
+```{r, fig.width = 8}
+grid.arrange(fig1,fig2)
+grid.arrange(fig3,fig4)
+grid.arrange(fig5,fig6)
+
+```
+
+```{r, include = FALSE}
+## DATA BY TREATMENT
+
+## Get total area of treated and untreated plots 
+## Then make a graph of total area by treatment
+
+TreatedArea <- sum(subset(est_data, TreatmentStatus == 'Treated')$PlotSize)
+
+UntreatedArea <- sum(subset(est_data, TreatmentStatus == 'Untreated')$PlotSize)
+
+TotalArea <- c(TreatedArea, UntreatedArea)
+
+Treatment <- c("Treated", "Untreated")
+
+AreaByTreatment <- data.frame(Treatment, TotalArea)
+
+## Get total number of trees in treated and untreated plots
+## Then make a graph of number of trees by treatment
+
+TreatedNumTrees <- sum(subset(est_data, TreatmentStatus == 'Treated')$Tree_count)
+
+UntreatedNumTrees <- sum(subset(est_data, TreatmentStatus == 'Untreated')$Tree_count)
+
+NumTrees <- c(TreatedNumTrees, UntreatedNumTrees)
+
+NumTreesByTreatment <- data.frame(Treatment, NumTrees)
+
+fig7<- ggplot(NumTreesByTreatment, aes(x = Treatment, y = NumTrees/3)) +
+  geom_bar(stat = "identity", color = 'black', aes(fill = Treatment)) +
+  xlab("") +
+  ylab("Trees per ha") +
+  ylim(0, 1800) +
+  scale_fill_manual(values=c("#e6b855", "#435e55ff")) +
+  theme_classic() +
+  theme(legend.position = "none")+
+  ggtitle("Tree density by treatment")
+
+## Get total number of MOG in treated and untreated plots
+## Then make a graph of number of MOG per treatment
+
+TreatedMOG <- sum(subset(est_data, TreatmentStatus == 'Treated')$MOG_count)
+
+UntreatedMOG <- sum(subset(est_data, TreatmentStatus == 'Untreated')$MOG_count)
+
+NumMOG <- c(TreatedMOG, UntreatedMOG)
+
+NumMOGByTreatment <- data.frame(Treatment, NumMOG)
+
+fig8<- ggplot(NumMOGByTreatment, aes(x = Treatment, y = NumMOG/3)) +
+  geom_bar(stat = "identity", color = 'black', aes(fill = Treatment)) +
+  xlab("") +
+  ylab("MOG per ha") +
+  ylim(0, 600) +
+  scale_fill_manual(values=c("#e6b855", "#435e55ff")) +
+  theme_classic() +
+  theme(legend.position = "none")+
+  ggtitle("Mature/old growth density by treatment")
+
+## Get number of live MOG's in treated and untreated plots
+## Then make a graph of the number of live MOG per treatment
+
+TreatedLiveMOG <- sum(subset(est_data, TreatmentStatus == 'Treated')$MOG_live_count)
+
+UntreatedLiveMOG <- sum(subset(est_data, TreatmentStatus == 'Untreated')$MOG_live_count)
+
+NumLiveMOG <- c(TreatedLiveMOG, UntreatedLiveMOG)
+
+NumLiveMOGbyTreatment <- data.frame(Treatment, NumLiveMOG)
+
+fig9<- ggplot(NumMOGByTreatment, aes(x = Treatment, y = NumLiveMOG/3)) +
+  geom_bar(stat = "identity", color = 'black', aes(fill = Treatment)) +
+  xlab("") +
+  ylab("Live MOG per ha") +
+  ylim(0, 600) +
+  scale_fill_manual(values=c("#e6b855", "#435e55ff")) +
+  theme_classic() +
+  theme(legend.position = "none")+
+  ggtitle("Live mature/old growth density by treatment")
+
+## Get number of OG's in the treated and untreated pots
+## Then make a graph of the number of OG's per treatment
+
+TreatedOG <- sum(subset(est_data, TreatmentStatus == 'Treated')$OG_count)
+  
+UntreatedOG <- sum(subset(est_data, TreatmentStatus == 'Untreated')$OG_count)
+  
+NumOG <- c(TreatedOG, UntreatedOG)
+  
+NumOGbyTreatment <- data.frame(Treatment, NumOG)
+
+fig10 <- ggplot(NumMOGByTreatment, aes(x = Treatment, y = NumOG/3)) +
+  geom_bar(stat = "identity", color = 'black', aes(fill = Treatment)) +
+  xlab("") +
+  ylab("Old growth per ha") +
+  ylim(0, 400) +
+  scale_fill_manual(values=c("#e6b855", "#435e55ff")) +
+  theme_classic() +
+  theme(legend.position = "none")+
+  ggtitle("Old growth density by treatment")
+
+
+```
+
+### Figures by Treatment
+
+```{r, fig.height = 7, fig.width = 9}
+grid.arrange(fig7,fig10, fig8, fig9)
+```
+
+### DBH Histograms & Species Composition
+```{r, include = FALSE}
+
+
+merged_plots$SpeciesID <- factor(merged_plots$SpeciesID, levels =
+                              c("PSME", "PIST", "ABCO", "PIPO", "SASC", "POTR", "PIED", "QUUN", "QUGA", "ACGL", "PRVI", "JUMO", "JUSC", "unknown", "NA"))
+                                
+                               
+#same but facet by treatment status
+# Change the width of bins
+  plot1<-ggplot(merged_plots, aes(x=Diameter, fill = SpeciesID)) +
+  geom_histogram(binwidth=2)+
+  scale_fill_manual(values = c("ABCO" = "#4EDFC7", 
+                                   "ACGL" = "#C21E56",  
+                                   "JUMO" = "#FFC0CB", 
+                                   "JUSC" = "#95658B",
+                                   "PIED" = "#FFD700",
+                                   "PIPO" = "#2E8B57",
+                                   "PIST" = "#89CFF0",
+                                   "POTR" = "#F1EAA9",
+                                   "PRVI" = "#9F2B68",
+                                   "PSME" = "#216E90",
+                                   "QUGA" = "#CC5500",
+                                   "QUUN" = "#E3963E",
+                                   "SASC" = "#AFE1AF",
+                                   "unknown"= "#808080" ,
+                                   "NA" = "#808080" ))+
+     
+  xlab("Diameter (cm)")+
+  facet_wrap(~TreatmentStatus)+
+    theme_minimal()+
+  theme(strip.text = element_text(size =15))+
+    ggtitle("DBH histogram by species and treatment")
+  
+
+
+merged_plots$Tree_condition <- as.factor(merged_plots$Tree_condition)
+#rename Tree_condition codes with words that make sense
+merged_plots <- merged_plots %>%
+  mutate(Cond = case_when(Tree_condition == 1 ~ "Live", 
+                          Tree_condition == 2 | Tree_condition == 5 | Tree_condition == 6 ~ "Dead",
+                          Tree_condition == 3 | Tree_condition == 4 | Tree_condition == 7 ~ "DALB",
+                          Tree_condition == 8 | Tree_condition == 9 | Tree_condition == 10 | Tree_condition == 11 ~"Missing"))
+
+#create Tree_condition plot faceted by treatment status with nice logical color scheme
+merged_plots$Tree_condition <- as.factor(merged_plots$Cond)
+#all trees by plot (live vs. dead)
+# Change the width of bins
+  plot2<- ggplot(merged_plots, aes(x=Diameter, fill = Cond, color = Cond)) + 
+  scale_fill_manual(values=c("#e8bb61", "#c7505c", "#8ccfa8", "#56B4E9"))+
+    theme(legend.text = element_text(size=15), legend.title =element_blank(), legend.position = c(0.9, 0.9), legend.key.size = unit(0.4, 'in')) +
+  scale_color_manual(values = c("grey40","grey40","grey40","grey40"))+
+  geom_histogram(binwidth=2)+
+  xlab("Diameter (cm)")+
+  facet_wrap(~TreatmentStatus)+
+  theme_minimal()+
+  theme(strip.text = element_text(size =15))+
+    ggtitle("DBH histogram by condition and treatment")
+  
+   
+  
+
+```
+
+```{r, fig.width =6, fig.height = 6}
+plot1
+plot2
+```
+
+```{r, include = FALSE}
+# Stacked percent bar graph of number of species
+ 
+ #calculate species densities by plot
+merged_species_density <- merged_plots %>%
+  group_by(Plot, PlotSize, TreatmentStatus, SpeciesID) %>%
+  summarize(Count = n())
+
+merged_species_density$density <- merged_species_density$Count/merged_species_density$PlotSize
+   
+ #calculate species counts by treatment
+merged_species <- merged_plots %>%
+  group_by(TreatmentStatus, SpeciesID) %>%
+  summarize(Count = n())
+
+
+
+
+plot4<-ggplot(merged_species, aes(x=TreatmentStatus, y =Count, fill = SpeciesID)) +
+ geom_bar(stat = "identity", position = "stack" )+
+ #scale_fill_identity()+
+ scale_fill_manual(values = c("ABCO" = "#4EDFC7", 
+                              "ACGL" = "#C21E56",  
+                              "JUMO" = "#FFC0CB", 
+                              "JUSC" = "#95658B",
+                              "PIED" = "#FFD700",
+                              "PIPO" = "#2E8B57",
+                              "PIST" = "#89CFF0",
+                              "POTR" = "#F1EAA9",
+                              "PRVI" = "#9F2B68",
+                              "PSME" = "#216E90",
+                              "QUGA" = "#CC5500",
+                              "QUUN" = "#E3963E",
+                              "SASC" = "#AFE1AF",
+                              "unknown"= "#808080" ,
+                              "NA" = "#808080" ))+
+ theme_minimal()+
+     ylab("Count")+
+  ggtitle("Tree counts by treatment")
+ 
+
+
+plot5<-ggplot(merged_species, aes(x=TreatmentStatus, y =Count, fill = SpeciesID)) +
+ geom_bar(stat = "identity", position = "fill" )+
+ #scale_fill_identity()+
+ scale_fill_manual(values = c("ABCO" = "#4EDFC7", 
+                              "ACGL" = "#C21E56",  
+                              "JUMO" = "#FFC0CB", 
+                              "JUSC" = "#95658B",
+                              "PIED" = "#FFD700",
+                              "PIPO" = "#2E8B57",
+                              "PIST" = "#89CFF0",
+                              "POTR" = "#F1EAA9",
+                              "PRVI" = "#9F2B68",
+                              "PSME" = "#216E90",
+                              "QUGA" = "#CC5500",
+                              "QUUN" = "#E3963E",
+                              "SASC" = "#AFE1AF",
+                              "unknown"= "#808080" ,
+                              "NA" = "#808080" ))+
+ #facet_wrap(~TreatmentStatus)+
+ theme_minimal()+
+     ylab("Proportion of individuals")+
+    ggtitle("Species composition by treatment")
+ 
+ 
+ plot6<-ggplot(filter(merged_species_density, TreatmentStatus == "Treated"), aes(x=Plot, y =Count, fill = SpeciesID)) +
+ geom_bar(stat = "identity", position = "fill" )+
+ #scale_fill_identity()+
+ scale_fill_manual(values = c("ABCO" = "#4EDFC7", 
+                              "ACGL" = "#C21E56",  
+                              "JUMO" = "#FFC0CB", 
+                              "JUSC" = "#95658B",
+                              "PIED" = "#FFD700",
+                              "PIPO" = "#2E8B57",
+                              "PIST" = "#89CFF0",
+                              "POTR" = "#F1EAA9",
+                              "PRVI" = "#9F2B68",
+                              "PSME" = "#216E90",
+                              "QUGA" = "#CC5500",
+                              "QUUN" = "#E3963E",
+                              "SASC" = "#AFE1AF",
+                              "unknown"= "#808080" ,
+                              "NA" = "#808080" ))+
+ #facet_wrap(~TreatmentStatus)+
+ theme_minimal()+
+ ylab("Proportion of individuals")+
+ #theme(axis.text.x = element_text(angle = 45, vjust = 0.5, hjust=1))+
+ ggtitle("Treated Plots Species Composition")
+ 
+ plot7<-ggplot(filter(merged_species_density, TreatmentStatus == "Untreated"), aes(x=Plot, y =Count, fill = SpeciesID)) +
+ geom_bar(stat = "identity", position = "fill" )+
+ #scale_fill_identity()+
+ scale_fill_manual(values = c("ABCO" = "#4EDFC7", 
+                              "ACGL" = "#C21E56",  
+                              "JUMO" = "#FFC0CB", 
+                              "JUSC" = "#95658B",
+                              "PIED" = "#FFD700",
+                              "PIPO" = "#2E8B57",
+                              "PIST" = "#89CFF0",
+                              "POTR" = "#F1EAA9",
+                              "PRVI" = "#9F2B68",
+                              "PSME" = "#216E90",
+                              "QUGA" = "#CC5500",
+                              "QUUN" = "#E3963E",
+                              "SASC" = "#AFE1AF",
+                              "unknown"= "#808080" ,
+                              "NA" = "#808080" ))+
+ #facet_wrap(~TreatmentStatus)+
+ theme_minimal()+
+ ylab("Proportion of individuals")+
+ #theme(axis.text.x = element_text(angle = 45, vjust = 0.5, hjust=1))+
+   ggtitle("Untreated Plots Species Composition")
+ 
+
+```
+
+
+
+```{r,fig.width = 6, fig.height = 6}
+plot4
+plot5
+
+
+```
+
+```{r, fig.with = 8, fig.height = 8}
+grid.arrange(plot6, plot7)
+```
+
+### Basal Area Figures
+```{r, include = FALSE} 
+merged_plots$basal_area <- (0.00007854 * (merged_plots$Diameter)^2)
+
+merged_plots_ba_sum <- merged_plots %>%
+  group_by(Plot, PlotSize, TreatmentStatus, SpeciesID) %>%
+  summarize(ba_sum= sum(basal_area, na.rm = TRUE))
+
+merged_plots_ba_sum$ba_sum_per_ha <- merged_plots_ba_sum$ba_sum/merged_plots_ba_sum$PlotSize
+            
+plot8 <- ggplot(filter(merged_plots_ba_sum, TreatmentStatus == "Treated"), aes(x=Plot, y =ba_sum_per_ha, fill = SpeciesID)) +
+ geom_bar(stat = "identity", position = "stack" )+
+ #scale_fill_identity()+
+ scale_fill_manual(values = c("ABCO" = "#4EDFC7", 
+                              "ACGL" = "#C21E56",  
+                              "JUMO" = "#FFC0CB", 
+                              "JUSC" = "#95658B",
+                              "PIED" = "#FFD700",
+                              "PIPO" = "#2E8B57",
+                              "PIST" = "#89CFF0",
+                              "POTR" = "#F1EAA9",
+                              "PRVI" = "#9F2B68",
+                              "PSME" = "#216E90",
+                              "QUGA" = "#CC5500",
+                              "QUUN" = "#E3963E",
+                              "SASC" = "#AFE1AF",
+                              "unknown"= "#808080" ,
+                              "NA" = "#808080" ))+
+ theme_minimal()+
+     ylab("Basal area/ha (m^2)")+
+  ylim(0,45)+
+  ggtitle("Treated plots: basal area per hectare")
+
+
+plot9 <-ggplot(filter(merged_plots_ba_sum, TreatmentStatus == "Untreated"), aes(x=Plot, y =ba_sum_per_ha, fill = SpeciesID)) +
+ geom_bar(stat = "identity", position = "stack" )+
+ #scale_fill_identity()+
+ scale_fill_manual(values = c("ABCO" = "#4EDFC7", 
+                              "ACGL" = "#C21E56",  
+                              "JUMO" = "#FFC0CB", 
+                              "JUSC" = "#95658B",
+                              "PIED" = "#FFD700",
+                              "PIPO" = "#2E8B57",
+                              "PIST" = "#89CFF0",
+                              "POTR" = "#F1EAA9",
+                              "PRVI" = "#9F2B68",
+                              "PSME" = "#216E90",
+                              "QUGA" = "#CC5500",
+                              "QUUN" = "#E3963E",
+                              "SASC" = "#AFE1AF",
+                              "unknown"= "#808080" ,
+                              "NA" = "#808080" ))+
+ theme_minimal()+
+     ylab("Basal area/ha (m^2)")+
+   ylim(0,45)+
+  ggtitle("Untreated plots: basal area per hectare")
+
+merged_plots_ba_tx <- merged_plots_ba_sum %>%
+  group_by(TreatmentStatus, SpeciesID) %>%
+  summarize(ba_sum_tx = sum(ba_sum))
+
+  
+plot10<-ggplot(merged_plots_ba_tx, aes(x=TreatmentStatus, y =ba_sum_tx/3, fill = SpeciesID)) +
+ geom_bar(stat = "identity", position = "stack" )+
+ #scale_fill_identity()+
+ scale_fill_manual(values = c("ABCO" = "#4EDFC7", 
+                              "ACGL" = "#C21E56",  
+                              "JUMO" = "#FFC0CB", 
+                              "JUSC" = "#95658B",
+                              "PIED" = "#FFD700",
+                              "PIPO" = "#2E8B57",
+                              "PIST" = "#89CFF0",
+                              "POTR" = "#F1EAA9",
+                              "PRVI" = "#9F2B68",
+                              "PSME" = "#216E90",
+                              "QUGA" = "#CC5500",
+                              "QUUN" = "#E3963E",
+                              "SASC" = "#AFE1AF",
+                              "unknown"= "#808080" ,
+                              "NA" = "#808080" ))+
+ theme_minimal()+
+     ylab("Basal area/ha (m^2)")+
+   ylim(0,45)+
+  ggtitle("Basal area per hectare by treatment ")
+
+
+
+```
+
+```{r, fig.width = 9, fig.height = 5}
+grid.arrange(plot9,plot8, ncol=2)
+
+```
+
+```{r, fig.height = 6, fig.with = 3}
+plot10
+
+```
